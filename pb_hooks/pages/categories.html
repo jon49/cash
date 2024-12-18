@@ -1,0 +1,23 @@
+{{define "title"}}Categories{{end}}
+
+{{define "header"}}
+<h2>Categories</h2>
+<a href="/app/categories/edit">Add Category</a>
+{{end}}
+
+{{define "main"}}
+<table>
+    <thead>
+        <tr> <th>Category</th> <th>Subcategory</th> </tr>
+    </thead>
+    <tbody>
+        {{range .categories}}
+        <tr>
+            <td>{{.category}}</td>
+            <td>{{.subcategory}}</td>
+            <td> <a href="/app/categories/edit?id={{.id}}">Edit</a></td>
+        </tr>
+        {{end}}
+    </tbody>
+</table>
+{{end}}
