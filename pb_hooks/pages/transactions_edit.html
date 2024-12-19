@@ -5,7 +5,9 @@
 {{end}}
 
 {{define "main"}}
-{{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
+{{if .msg}}<noscript>
+    <p class="msg">{{.msg}}</p>
+</noscript>{{end}}
 <form method="post" action="/app/transactions/edit">
     <input type="hidden" name="id" value="{{.id}}">
     <fieldset class="grid">
@@ -19,12 +21,12 @@
         </label>
     </fieldset>
 
-    <input type=hidden name=detailId >
+    <input type=hidden name=detailId>
     <fieldset data-categories class="grid">
         <label>Category*
             <select name=categoryId required>
                 {{range .categories}}
-                    <option value="{{.id}}"  {{if eq $.categoryId .id}}selected{{end}}>{{.category}}</option>
+                <option value="{{.id}}" {{if eq $.categoryId .id}}selected{{end}}>{{.category}}</option>
                 {{end}}
             </select>
         </label>
@@ -39,5 +41,6 @@
         <a role="button" href="/app/categories/edit">Add Category</a>
     </div>
 </form>
-<br><p><small>* required</small></p>
+<br>
+<p><small>* required</small></p>
 {{end}}

@@ -1,18 +1,20 @@
 {{define "category-form"}}
-{{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
+{{if .msg}}<noscript>
+    <p class="msg">{{.msg}}</p>
+</noscript>{{end}}
 <form id=categoryForm method="post" action="/app/categories/edit">
-<input type="hidden" name=id value="{{.id}}">
-<fieldset class=grid>
-    <label>Category
-        <select name=category required>
-            <option value=expense {{if eq .category "expense"}}selected{{end}}>Expense</option>
-            <option value=income {{if eq .category "income"}}selected{{end}}>Income</option>
-        </select>
-    </label>
-    <label>Subcategory
-        <input type=text name=subcategory value="{{.subcategory}}" required autofocus>
-    </label>
-</fieldset>
+    <input type="hidden" name=id value="{{.id}}">
+    <fieldset class=grid>
+        <label>Category
+            <select name=category required>
+                <option value=expense {{if eq .category "expense" }}selected{{end}}>Expense</option>
+                <option value=income {{if eq .category "income" }}selected{{end}}>Income</option>
+            </select>
+        </label>
+        <label>Subcategory
+            <input type=text name=subcategory value="{{.subcategory}}" required autofocus>
+        </label>
+    </fieldset>
 </form>
 
 <footer class="grid reverse">

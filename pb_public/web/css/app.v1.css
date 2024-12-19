@@ -11,3 +11,8 @@ body {
     color: coral;
     font-size: large;
 }
+
+.sticky {
+    position: sticky;
+    bottom: 0;
+}

@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{block "title" .}}{{end}} $ Cash Tracker</title>
     <link href="/web/css/pico.min.css" rel=stylesheet>
-    <link href="/web/css/app.css" rel=stylesheet>
-    <script type="module" src="/web/js/app.js"></script>
+    <link href="/web/css/app.v1.css" rel=stylesheet>
+    <script type="module" src="/web/js/app.v1.js"></script>
 </head>
 
 <body class=container>
@@ -34,6 +34,10 @@
         {{block "main" .}}{{end}} </main>
 
     <footer><small>v001</small></footer>
+
+    <div class="sticky">
+        <noscript-toast></noscript-toast>
+    </div>
 
 </body>
 
