@@ -14,7 +14,7 @@ routerAdd("get", "/app/transactions/edit", e => {
         return e.redirect(303, "/app/categories/edit")
     }
 
-    let {capitalize} = require(`${__hooks}/utils.js`)
+    let {capitalize, formatDate} = require(`${__hooks}/utils.js`)
     data.categories = records.map(x => ({
         category: `${capitalize(x.get("category_type"))} - ${x.get("name")}`,
         id: x.id,
@@ -30,7 +30,7 @@ routerAdd("get", "/app/transactions/edit", e => {
             id,
             header: "Edit Transaction",
             edit: true,
-            date: transaction.get("date"),
+            date: formatDate(transaction.get("date")),
             description: transaction.get("description"),
             amount: transaction.get("amount"),
             categoryId: data.categories.find(y => y.id === categoryId).id,

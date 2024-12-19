@@ -10,15 +10,15 @@ routerAdd("get", "/app/transactions", e => {
 
     let categories = $app.findRecordsByFilter("categories", `user='${userId}'`)
 
+    let { capitalize, formatDate } = require(`${__hooks}/utils.js`)
     let data = {
         transactions: transactions.map(transaction => {
-            let date = new Date(transaction.get("date"))
+            let date = formatDate(transaction.get("date"))
             let category = categories.find(category => category.id === transaction.get("category"))
-            let { capitalize } = require(`${__hooks}/utils.js`)
-            let categoryName = capitalize(category.get("category_type")) + " - " + category.get("name")
+            let categoryName = `${capitalize(category.get("category_type"))} - ${category.get("name")}`
             return {
                 id: transaction.id,
-                date: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
+                date,
                 description: transaction.get("description"),
                 amount: +transaction.get("amount"),
                 category: categoryName,

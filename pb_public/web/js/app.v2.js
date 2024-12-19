@@ -5,8 +5,12 @@ function connectedCallback(ctx) {
     }
 
     // not yet available, watch it for _init
-    ctx.observer = new MutationObserver(ctx.init.bind(ctx))
-    ctx.observer.observe(ctx, { childList: true })
+    let observer = new MutationObserver(() => {
+        observer.disconnect()
+        observer = null
+        ctx.init()
+    })
+    observer.observe(ctx, { childList: true })
 }
 
 customElements.define("date-fill",
@@ -18,7 +22,7 @@ class DateFill extends HTMLElement {
     init() {
         let el = this.firstElementChild
         let value = el?.value
-        if (value == null || value.length > 0) return
+        if (value?.length > 0) return
         let today = new Date()
         let formattedDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
         el.value = formattedDate;
