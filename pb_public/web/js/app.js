@@ -29,10 +29,10 @@ class DateFill extends HTMLElement {
     }
 })
 
-function togglePopover(el, timeout) {
-    el.showPopover()
+function togglePopover(el) {
+    let wordCount = el.textContent.split(/\s+/).length
+    let timeout = 1e3 + wordCount * 400
     setTimeout(() => {
-        el.hidePopover()
         el.parentElement.remove()
     }, timeout)
 }
@@ -44,12 +44,10 @@ customElements.define("noscript-toast", class NoScriptToast extends HTMLElement 
         if (!el) return
         let html = el.textContent.trim()
         if (!html) return
-        let popover = d.createElement("article")
-        popover.innerHTML = html
-        popover.popover = "manual"
-        this.append(popover)
-        let wordCount = popover.textContent.split(/\s+/).length
-        let timeout = 1e3 + wordCount * 400
-        togglePopover(popover, timeout)
+        let toaster = d.createElement("article")
+        toaster.setAttribute("role", "alert")
+        toaster.innerHTML = html
+        this.append(toaster)
+        togglePopover(toaster)
     }
 })
