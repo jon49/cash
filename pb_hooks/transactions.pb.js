@@ -20,18 +20,17 @@ routerAdd("get", "/app/transactions", e => {
                 id: transaction.id,
                 date,
                 description: transaction.get("description"),
-                amount: +transaction.get("amount"),
+                amount: -transaction.get("amount"),
                 category: categoryName,
             }
         }),
     }
 
     data.total = data.transactions.reduce((sum, transaction) => {
-            if (transaction.category.startsWith("Income")) {
-                return sum + transaction.amount
-            }
-            return sum - transaction.amount
-        }, 0)
+        return (transaction.category.startsWith("Income"))
+            ? sum - transaction.amount
+            : sum + transaction.amount
+    }, 0)
 
     const html = $template.loadFiles(
         `${__hooks}/pages/layout.html`,
