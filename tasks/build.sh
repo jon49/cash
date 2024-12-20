@@ -19,15 +19,12 @@ for file in $(find . -type f); do
 done
 cd ../..
 
-# print out the original and new files
 for i in ${!original_files[@]}; do
     # original file with the period removed
     original_file=$(echo ${original_files[$i]} | sed 's/^\.//')
     # new file with the period removed
     new_file=$(echo ${new_files[$i]} | sed 's/^\.//')
-    # in the replacement command it doesn't account for the forward slashes
     original_file=$(echo $original_file | sed 's/\//\\\//g')
     new_file=$(echo $new_file | sed 's/\//\\\//g')
     sed -i "s/$original_file/$new_file/g" dist/pb_hooks/pages/layout.html
 done
-

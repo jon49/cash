@@ -39,6 +39,9 @@ routerAdd("post", "/app/categories/edit", e => {
     let record
     if (id) {
         record = $app.findRecordById("categories", id)
+        if (record.get("user") !== userId) {
+            return e.redirect(302, "/app/categories/edit?msg=Unauthorized")
+        }
     } else {
         let collection = $app.findCollectionByNameOrId("categories")
         record = new Record(collection)
@@ -48,5 +51,5 @@ routerAdd("post", "/app/categories/edit", e => {
     record.set("category_type", category)
     record.set("name", subcategory)
     $app.save(record)
-    e.redirect(302, `/app/categories/edit?id=${record.id}&msg=Saved!`)
+    e.redirect(302, `/app/categories`)
 })

@@ -8,6 +8,7 @@
 {{if .msg}}<noscript>
     <p class="msg">{{.msg}}</p>
 </noscript>{{end}}
+
 <form method="post" action="/app/transactions/edit">
     <input type="hidden" name="id" value="{{.id}}">
     <fieldset class="grid">

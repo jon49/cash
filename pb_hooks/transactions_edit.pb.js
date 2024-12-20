@@ -14,7 +14,7 @@ routerAdd("get", "/app/transactions/edit", e => {
         return e.redirect(303, "/app/categories/edit")
     }
 
-    let {capitalize, formatDate} = require(`${__hooks}/utils.js`)
+    let { capitalize, formatDate } = require(`${__hooks}/utils.js`)
     data.categories = records.map(x => ({
         category: `${capitalize(x.get("category_type"))} - ${x.get("name")}`,
         id: x.id,
@@ -60,7 +60,6 @@ routerAdd("post", "/app/transactions/edit", e => {
     let transaction
 
     if (id) {
-        console.log("IIIIIIIIIIIIIIIDDDDDDDDDDDDD", id)
         transaction = $app.findRecordById("transactions", id)
         if (transaction.get("user") !== userId) {
             return e.redirect(303, "/app/transactions/edit?msg=Unauthorized")
@@ -77,5 +76,5 @@ routerAdd("post", "/app/transactions/edit", e => {
     transaction.set("category", categoryId)
     $app.save(transaction)
 
-    e.redirect(303, `/app/transactions/edit?id=${transaction.id}&msg=Saved!`)
+    e.redirect(303, `/app/transactions`)
 })
