@@ -12,8 +12,10 @@
             <th>Category</th>
             <th>Amount</th>
             <th>Description</th>
+            <th></th>
         </tr>
     </thead>
+
     <tbody>
         {{range .transactions}}
         <tr>
@@ -21,13 +23,20 @@
             <td>{{.category}}</td>
             <td>{{.amount}}</td>
             <td>{{.description}}</td>
+            <td>
+                <form method="post" action="/app/transactions/edit?handler=delete">
+                    <input type="hidden" name="id" value="{{.id}}">
+                    <input class="outline secondary m-0 p-0 px-3 fs-1" type="submit" aria-label="Delete"
+                        value="&times;">
+                </form>
+            </td>
         </tr>
         {{end}}
     </tbody>
     <tfoot>
         <tr>
             <td colspan=2>Total</td>
-            <td colspan="2">{{.total}}</td>
+            <td colspan="3">{{.total}}</td>
         </tr>
     </tfoot>
 </table>

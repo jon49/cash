@@ -11,3 +11,20 @@ body {
     color: coral;
     font-size: large;
 }
+
+.m-0 {
+    margin: 0 !important;
+}
+
+.p-0 {
+    padding: 0 !important;
+}
+
+.px-3 {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+}
+
+.fs-1 {
+    font-size: 2rem;
+}
