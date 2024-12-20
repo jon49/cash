@@ -7,22 +7,34 @@ cp -r pb_hooks dist/pb_hooks
 mkdir dist/public
 cp -r pb_public/* dist/public
 
-cd dist/public
-for file in $(find . -type f); do
-  original_files+=($file)
-  hash=$(md5sum $file | cut -d ' ' -f 1)
-  # last 8 characters of md5 hash
-  hash=${hash:24}
-  new_file=($(echo $file | sed "s/\(.*\)\.\(.*\)/\1.$hash.\2/"))
-  new_files+=($new_file)
-  mv $file $new_file
-done
-cd ../..
+# Function to generate MD5 hash for a file
+generate_md5_hash() {
+    local file=$1
+    md5sum $file | cut -d ' ' -f 1 | rev | cut -c 1-10 | rev
+}
 
-for i in ${!original_files[@]}; do
-    # Remove leading dot and replace slashes with escaped slashes
-    original_file=$(echo ${original_files[$i]} | sed 's/^\.//' | sed 's/\//\\\//g')
-    new_file=$(echo ${new_files[$i]} | sed 's/^\.//' | sed 's/\//\\\//g')
-    # Replace original file with new file path in layout.html
-    sed -i "s/$original_file/$new_file/g" dist/pb_hooks/pages/layout.html
-done
+# Read layout.html
+layout_file="pb_hooks/pages/layout.html"
+dist_layout_file="dist/pb_hooks/pages/layout.html"
+cp $layout_file $dist_layout_file
+
+destStaticDir="dist/public"
+
+# Find linked static files and update layout.html with MD5 hash
+while IFS= read -r line; do
+    if [[ $line =~ \<link.*href=\"(.*)\" ]]; then
+        file="${BASH_REMATCH[1]}"
+        if [[ $file != http* ]]; then
+            hash=$(generate_md5_hash "$destStaticDir/$file")
+            new_file="${file}?_=${hash}"
+            sed -i "s|$file|$new_file|g" $dist_layout_file
+        fi
+    elif [[ $line =~ \<script.*src=\"([^ ]*)\" ]]; then
+        file="${BASH_REMATCH[1]}"
+        if [[ $file != http* ]]; then
+            hash=$(generate_md5_hash "pb_public/$file")
+            new_file="${file}?_=${hash}"
+            sed -i "s|$file|$new_file|g" $dist_layout_file
+        fi
+    fi
+done < $layout_file
