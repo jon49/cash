@@ -2,7 +2,7 @@
 
 routerAdd("get", "/app/transactions", e => {
     let userId = e.get("userId")
-    let transactions = $app.findRecordsByFilter("transactions", `user='${userId}'`)
+    let transactions = $app.findRecordsByFilter("transactions", `user='${userId}'`, "-date,-created")
 
     if (transactions.length === 0) {
         e.redirect(302, "/app/transactions/edit?msg=Create a transaction first.")
