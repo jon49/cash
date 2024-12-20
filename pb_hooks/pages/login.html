@@ -7,9 +7,7 @@ Login
 {{define "main"}}
 <template id="login-form">
     <form method="post" action="/">
-        {{if .msg}}<noscript>
-            <p class="msg">{{.msg}}</p>
-        </noscript>{{end}}
+        {{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
         <fieldset class="grid">
             <input placeholder="Email" aria-label="Email" type="text" name=email required autocomplete="email"
                 autofocus></label>

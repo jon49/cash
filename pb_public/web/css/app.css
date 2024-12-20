@@ -11,10 +11,3 @@ body {
     color: coral;
     font-size: large;
 }
-
-.toaster-parent {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-}

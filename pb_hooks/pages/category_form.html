@@ -1,7 +1,5 @@
 {{define "category-form"}}
-{{if .msg}}<noscript>
-    <p class="msg">{{.msg}}</p>
-</noscript>{{end}}
+{{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
 <form id=categoryForm method="post" action="/app/categories/edit">
     <input type="hidden" name=id value="{{.id}}">
     <fieldset class=grid>
