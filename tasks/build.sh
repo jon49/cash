@@ -20,11 +20,9 @@ done
 cd ../..
 
 for i in ${!original_files[@]}; do
-    # original file with the period removed
-    original_file=$(echo ${original_files[$i]} | sed 's/^\.//')
-    # new file with the period removed
-    new_file=$(echo ${new_files[$i]} | sed 's/^\.//')
-    original_file=$(echo $original_file | sed 's/\//\\\//g')
-    new_file=$(echo $new_file | sed 's/\//\\\//g')
+    # Remove leading dot and replace slashes with escaped slashes
+    original_file=$(echo ${original_files[$i]} | sed 's/^\.//' | sed 's/\//\\\//g')
+    new_file=$(echo ${new_files[$i]} | sed 's/^\.//' | sed 's/\//\\\//g')
+    # Replace original file with new file path in layout.html
     sed -i "s/$original_file/$new_file/g" dist/pb_hooks/pages/layout.html
 done
