@@ -1,0 +1,20 @@
+body {
+    padding: 1em 0.5em 50vh 0.5em;
+}
+
+/** RTL for Grid **/
+.reverse {
+    direction: rtl;
+}
+
+.msg {
+    color: coral;
+    font-size: large;
+}
+
+.toaster-parent {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
