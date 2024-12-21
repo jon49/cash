@@ -62,12 +62,10 @@ routerAdd("post", "/app/transactions/delete", e => {
     }
 
     let record = $app.findRecordById("transactions", id)
-    console.log("RECORD::::::::::::::::::::", record)
     if (!record) {
         return e.redirect(302, `/app/transactions?msg=Transaction not found!`)
     }
     record.set("deleted", new Date().toISOString())
-    console.log("RECORD::::::::::::::::::::", record)
 
     $app.save(record)
 
