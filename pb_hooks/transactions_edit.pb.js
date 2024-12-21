@@ -55,22 +55,6 @@ routerAdd("get", "/app/transactions/edit", e => {
 /// <reference path="../pb_data/types.d.ts" />
 
 routerAdd("post", "/app/transactions/edit", e => {
-    if (e.request.url.query().get("handler") === "delete") {
-        // Delete
-        let { id } = e.requestInfo().body
-        if (!id) {
-            return e.redirect(302, `/app/transactions?msg=Transaction not found!`)
-        }
-
-        let record = $app.findRecordById("transactions", id)
-        if (!record) {
-            return e.redirect(302, `/app/transactions?msg=Transaction not found!`)
-        }
-        $app.delete(record)
-
-        return e.redirect(303, `/app/transactions`)
-    }
-
     let { id, date, description, categoryId, amount } = e.requestInfo().body
     let userId = e.get("userId")
     let transaction

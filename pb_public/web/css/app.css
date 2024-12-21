@@ -2,6 +2,10 @@ body {
     padding: 1em 0.5em 50vh 0.5em;
 }
 
+.inline {
+    display: inline;
+}
+
 /** RTL for Grid **/
 .reverse {
     direction: rtl;
