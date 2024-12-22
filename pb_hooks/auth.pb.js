@@ -1,20 +1,20 @@
 /// <reference path="../pb_data/types.d.ts" />
 
-routerAdd("get", "/{$}", e => {
+routerAdd("get", "/login", e => {
     let msg = e.request.url.query().get("msg")
 
     const html = $template.loadFiles(
         `${__hooks}/pages/layout.html`,
         `${__hooks}/pages/login.html`,
-    ).render({msg})
+    ).render({ msg, loggedOut: true })
 
     return e.html(200, html)
 })
 
-routerAdd("post", "/{$}", e => {
+routerAdd("post", "/login", e => {
     try {
         let form = e.requestInfo().body
-        let tryAgain = "/?msg=Oops! That didn't work. Please try again."
+        let tryAgain = "/login?msg=Oops! That didn't work. Please try again."
         let user = $app.findAuthRecordByEmail("users", form.email)
         if (!user) return e.redirect(302, tryAgain)
         if (!user.validatePassword(form.password)) return e.redirect(302, tryAgain)
@@ -54,5 +54,5 @@ routerAdd("get", "/app/logout", e => {
         maxAge: 0,
         value: "",
     })
-    e.redirect(302, "/")
+    e.redirect(302, "/login")
 })

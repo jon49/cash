@@ -19,12 +19,14 @@
                     <h1 aria-label="Cash" style="font-family:cursive;color: darkolivegreen;">Ca$h</h1>
                 </li>
             </ul>
+            {{if not .loggedOut}}
             <ul>
                 <li><a href="/app/transactions/edit">New Transaction</a></li>
                 <li><a href="/app/transactions">Transactions</a></li>
                 <li><a href="/app/categories">Categories</a></li>
                 <li><a href="/app/logout">Logout</a></li>
             </ul>
+            {{end}}
         </nav>
         {{block "header" .}}<h2>Cash</h2>{{end}}
     </header>
