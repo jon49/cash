@@ -1,6 +1,6 @@
 /// <reference path="../pb_data/types.d.ts" />
 
-routerAdd("get", "/app/transactions", e => {
+routerAdd("get", "/app/transactions/", e => {
     let userId = e.get("userId")
     let transactions = $app.findRecordsByFilter("transactions", `user='${userId}'`, "-date,-created")
 
@@ -54,7 +54,7 @@ routerAdd("get", "/app/transactions", e => {
     return e.html(200, html)
 })
 
-routerAdd("post", "/app/transactions/delete", e => {
+routerAdd("post", "/app/transactions/delete/", e => {
     // Delete
     let { id } = e.requestInfo().body
     if (!id) {
@@ -72,7 +72,7 @@ routerAdd("post", "/app/transactions/delete", e => {
     return e.redirect(303, `/app/transactions`)
 })
 
-routerAdd("post", "/app/transactions/restore", e => {
+routerAdd("post", "/app/transactions/restore/", e => {
     // Delete
     let { id } = e.requestInfo().body
     if (!id) {

@@ -1,6 +1,6 @@
 /// <reference path="../pb_data/types.d.ts" />
 
-routerAdd("get", "/app/categories/edit", e => {
+routerAdd("get", "/app/categories/edit/", e => {
     let id = e.request.url.query().get("id")
     let msg = e.request.url.query().get("msg")
     let data = {
@@ -32,7 +32,7 @@ routerAdd("get", "/app/categories/edit", e => {
     return e.html(200, html)
 })
 
-routerAdd("post", "/app/categories/edit", e => {
+routerAdd("post", "/app/categories/edit/", e => {
     let { category, subcategory, id } = e.requestInfo().body
     let userId = e.get("userId")
 

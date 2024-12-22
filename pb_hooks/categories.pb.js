@@ -1,6 +1,6 @@
 /// <reference path="../pb_data/types.d.ts" />
 
-routerAdd("get", "/app/categories", e => {
+routerAdd("get", "/app/categories/", e => {
     let records = $app.findRecordsByFilter("categories", `user='${e.get("userId")}'`, "category_type,name")
     if (records.length === 0) {
         return e.redirect(302, "/app/categories/edit")
@@ -30,7 +30,7 @@ routerAdd("get", "/app/categories", e => {
     return e.html(200, html)
 })
 
-routerAdd("post", "/app/categories/delete", e => {
+routerAdd("post", "/app/categories/delete/", e => {
     // Delete
     let { id } = e.requestInfo().body
     if (!id) {
@@ -42,14 +42,13 @@ routerAdd("post", "/app/categories/delete", e => {
         return e.redirect(302, `/app/categories?msg=Category not found!`)
     }
     record.set("deleted", new Date().toISOString())
-    console.log("RECORD::::::::::::::::::::", record)
 
     $app.save(record)
 
     return e.redirect(303, `/app/categories`)
 })
 
-routerAdd("post", "/app/categories/restore", e => {
+routerAdd("post", "/app/categories/restore/", e => {
     // Delete
     let { id } = e.requestInfo().body
     if (!id) {
