@@ -22,14 +22,15 @@ destStaticDir="dist/public"
 
 # Find linked static files and update layout.html with MD5 hash
 while IFS= read -r line; do
-    if [[ $line =~ \<link.*href=\"(.*)\" ]]; then
+    if [[ $line =~ \<link.*href=\"([^\"]+)\" ]]; then
         file="${BASH_REMATCH[1]}"
         if [[ $file != http* ]]; then
+            echo "Processing $file"
             hash=$(generate_md5_hash "$destStaticDir/$file")
             new_file="${file}?_=${hash}"
             sed -i "s|$file|$new_file|g" $dist_layout_file
         fi
-    elif [[ $line =~ \<script.*src=\"([^ ]*)\" ]]; then
+    elif [[ $line =~ \<.*src=\"([^ ]*)\" ]]; then
         file="${BASH_REMATCH[1]}"
         if [[ $file != http* ]]; then
             hash=$(generate_md5_hash "pb_public/$file")

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="/web/images/cash.ico">
+    <link href="/web/images/cash.ico" rel="icon" type="image/x-icon">
     <title>{{block "title" .}}{{end}} $ Cash Tracker</title>
     <link href="/web/css/pico.min.css" rel=stylesheet>
     <link href="/web/css/app.css" rel=stylesheet>
@@ -17,7 +17,7 @@
         <nav>
             <ul>
                 <li>
-                    <img style="height:2.5em;" src="/web/images/cash.svg" alt="Cash Tracker Logo"></img>
+                    <img src="/web/images/cash.svg" style="height:2.5em;" alt="Cash Tracker Logo"></img>
                 </li>
             </ul>
             {{if not .loggedOut}}
