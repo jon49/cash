@@ -21,12 +21,12 @@
     <tbody>
         {{range .transactions}}
         <tr>
-            <td><a href="/app/transactions/edit?id={{.id}}">{{.date}}</a></td>
+            <td><a href="/app/transactions/edit/?id={{.id}}">{{.date}}</a></td>
             <td>{{.category}}</td>
             <td>{{.amountView}}</td>
             <td>{{.description}}</td>
             <td>
-                <form method="post" action="/app/transactions/delete">
+                <form method="post" action="/app/transactions/delete/">
                     <input type="hidden" name="id" value="{{.id}}">
                     <input class="outline secondary m-0 p-0 px-3 fs-1" type="submit" aria-label="Delete"
                         value="&times;">
@@ -66,12 +66,12 @@
         <tbody>
             {{range .deletedTransactions}}
             <tr>
-                <td><a href="/app/transactions/edit?id={{.id}}">{{.date}}</a></td>
+                <td><a href="/app/transactions/edit/?id={{.id}}">{{.date}}</a></td>
                 <td>{{.category}}</td>
                 <td>{{.amountView}}</td>
                 <td>{{.description}}</td>
                 <td>
-                    <form method="post" action="/app/transactions/restore">
+                    <form method="post" action="/app/transactions/restore/">
                         <input type="hidden" name="id" value="{{.id}}">
                         <input class="m-0" type="submit" value="Restore">
                     </form>
