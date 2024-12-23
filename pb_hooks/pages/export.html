@@ -1,0 +1,19 @@
+{{define "title"}}
+Export Data
+{{end}}
+
+{{define "header"}}<h2>Export Data</h2>{{end}}
+
+{{define "main"}}
+
+<form method="post" action="/app/export/" target="_blank">
+    {{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
+    <label>
+        <input type="checkbox" name="deleteTransactions" role="switch" checked>
+        Delete exported transactions.
+    </label>
+    <br>
+    <input type="submit" value="Export">
+</form>
+
+{{end}}
