@@ -15,5 +15,5 @@
         }
     ],
     "start_url": "/app/transactions/edit/",
-    "display": "standalone"
+    "display": "fullscreen"
 }
