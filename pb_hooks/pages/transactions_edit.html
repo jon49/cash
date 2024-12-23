@@ -7,7 +7,7 @@
 {{define "main"}}
 {{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
 
-<form method="post" action="/app/transactions/edit">
+<form method="post" action="/app/transactions/edit/">
     <input type="hidden" name="id" value="{{.id}}">
     <fieldset class="grid">
         <label>Date*
@@ -37,7 +37,7 @@
     <div class="grid reverse">
         <button type=submit style="margin:0">Save</button>
         <!-- <button>Add Detail</button> -->
-        <a role="button" href="/app/categories/edit">Add Category</a>
+        <a role="button" href="/app/categories/edit/">Add Category</a>
     </div>
 </form>
 <br>
