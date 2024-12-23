@@ -1,6 +1,6 @@
 {{define "category-form"}}
 {{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
-<form id=categoryForm method="post" action="/app/categories/edit">
+<form id=categoryForm method="post" action="/app/categories/edit/">
     <input type="hidden" name=id value="{{.id}}">
     <fieldset class=grid>
         <label>Category
@@ -23,7 +23,7 @@
     </form>
     {{end}}
     {{if .edit}}
-    <a href="/app/categories/edit" role="button">Add Another Category</a>
+    <a href="/app/categories/edit/" role="button">Add Another Category</a>
     {{end}}
 </footer>
 {{end}}
