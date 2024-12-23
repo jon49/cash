@@ -15,17 +15,29 @@ generate_md5_hash() {
 
 # Read layout.html
 layout_file="pb_hooks/pages/layout.html"
+manifest_file="dist/public/web/manifest.json"
 dist_layout_file="dist/pb_hooks/pages/layout.html"
 cp $layout_file $dist_layout_file
 
 destStaticDir="dist/public"
+
+# In the dist/public/web/manifest.json file, find linked static image src files and add MD5 hash
+while IFS= read -r line; do
+    if [[ $line =~ \"src\":\ \"([^\"]+)\" ]]; then
+        file="${BASH_REMATCH[1]}"
+        if [[ $file != http* ]]; then
+            hash=$(generate_md5_hash "$destStaticDir/$file")
+            new_file="${file}?_=${hash}"
+            sed -i "s|$file|$new_file|g" $manifest_file
+        fi
+    fi
+done < $manifest_file
 
 # Find linked static files and update layout.html with MD5 hash
 while IFS= read -r line; do
     if [[ $line =~ \<link.*href=\"([^\"]+)\" ]]; then
         file="${BASH_REMATCH[1]}"
         if [[ $file != http* ]]; then
-            echo "Processing $file"
             hash=$(generate_md5_hash "$destStaticDir/$file")
             new_file="${file}?_=${hash}"
             sed -i "s|$file|$new_file|g" $dist_layout_file
