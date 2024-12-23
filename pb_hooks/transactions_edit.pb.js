@@ -52,8 +52,6 @@ routerAdd("get", "/app/transactions/edit/", e => {
     return e.html(200, html)
 })
 
-/// <reference path="../pb_data/types.d.ts" />
-
 routerAdd("post", "/app/transactions/edit/", e => {
     let { id, date, description, categoryId, amount } = e.requestInfo().body
     let userId = e.get("userId")
