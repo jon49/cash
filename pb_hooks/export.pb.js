@@ -20,7 +20,7 @@ routerAdd("post", "/app/export/", e => {
 
     let transactionViews = transactions.map(transaction => {
         let category = categories.find(category => category.id === transaction.get("category"))
-        return `${transaction.get("date").toString().slice(0, 10)},"${transaction.get("description")}",${transaction.get("amount")},${category.get("category_type")}:${category.get("name")}`
+        return `${transaction.get("date").toString().slice(0, 10)},"${transaction.get("description").replace('"', '\\"')}",${transaction.get("amount")},${category.get("category_type")}:${category.get("name")}`
     })
 
     let csv = `Date,Description,Amount,Category\n${transactionViews.join("\n")}`
