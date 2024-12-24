@@ -16,5 +16,5 @@
     ],
     "start_url": "/app/transactions/edit/",
     "scope": "/app/",
-    "display": "fullscreen"
+    "display": "standalone"
 }
