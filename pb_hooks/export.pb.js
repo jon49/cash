@@ -32,5 +32,8 @@ routerAdd("post", "/app/export/", e => {
         }
     }
 
+    e.response.header().set("Content-Type", "text/csv")
+    e.response.header().set("Content-Disposition", `attachment; filename="cash-transactions.csv"`)
+
     return e.string(200, csv)
 })
