@@ -32,9 +32,10 @@ cd "$(dirname "$0")"
 # Find all .hurl files and run tests
 run_hurl_tests ./login.hurl --cookie-jar ./cookie-jar.tsv
 run_hurl_tests ./clean-db.hurl --cookie ./cookie-jar.tsv
-run_hurl_tests ./logged-in-redirects.tests.hurl &
 run_hurl_tests ./login-page.tests.hurl &
+run_hurl_tests ./not-logged-in-redirects.tests.hurl &
 run_hurl_tests ./login.hurl --cookie-jar ./cookie-jar.tsv
+run_hurl_tests ./logged-in-redirects.tests.hurl --cookie ./cookie-jar.tsv
 run_hurl_tests ./create.tests.hurl --cookie ./cookie-jar.tsv
 run_hurl_tests ./delete.tests.hurl --cookie ./cookie-jar.tsv
 
