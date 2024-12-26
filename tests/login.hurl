@@ -6,3 +6,4 @@ password: {{password}}
 HTTP 302
 [Asserts]
 cookie "session" exists
+header "Location" equals "/app/transactions/edit"
