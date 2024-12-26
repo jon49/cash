@@ -87,3 +87,17 @@ xpath "string(//summary)" contains "View Deleted Transactions"
 xpath "string(//tbody/tr[1]/td[1]/a)" contains "2024-12-31"
 xpath "string(//table//tr[1]/td[5]/form/@action)" == "/app/transactions/restore/"
 xpath "//table//tfoot" not exists
+
+POST {{url}}/app/transactions/restore/
+[FormParams]
+id: {{id}}
+HTTP 302
+[Asserts]
+header "location" == "/app/transactions/"
+
+GET {{url}}/app/transactions/
+HTTP 200
+[Asserts]
+xpath "string(//h2)" == "Transactions"
+xpath "string(//table//tr[1]/td[1]/a)" == "2024-12-31"
+xpath "//summary" not exists
