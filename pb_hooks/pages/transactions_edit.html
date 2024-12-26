@@ -8,7 +8,7 @@
 {{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
 
 <form method="post" action="/app/transactions/edit/">
-    <input type="hidden" name="id" value="{{.id}}">
+    {{if .id}}<input type=hidden name=id value="{{.id}}">{{end}}
     <fieldset class="grid">
         <label>Date*
             <date-fill>
