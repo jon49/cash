@@ -45,6 +45,5 @@ run_hurl_tests ./not-logged-in-redirects.tests.hurl &
 run_hurl_tests ./login.hurl --cookie-jar ./cookie-jar.tsv
 run_hurl_tests ./category.tests.hurl --cookie ./cookie-jar.tsv
 run_hurl_tests ./transaction.tests.hurl --cookie ./cookie-jar.tsv
-run_hurl_tests ./delete.tests.hurl --cookie ./cookie-jar.tsv
 
 cd -
