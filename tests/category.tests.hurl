@@ -46,6 +46,7 @@ xpath "//form//input[@name='id']" exists
 [Captures]
 id: xpath "string(//form//input[@name='id']/@value)"
 
+# Make sure you can edit the category
 POST {{url}}/app/categories/edit/
 [FormParams]
 category: expense
@@ -61,3 +62,38 @@ HTTP 200
 xpath "string(//table//tr[1]/td[1])" == "Expense"
 xpath "string(//table//tr[1]/td[2])" == "Dining"
 xpath "string(//table//tr[1]/td[3]/a/@href)" == "/app/categories/edit/?id={{id}}"
+
+### It should be able to delete a category ###
+
+POST {{url}}/app/categories/edit/
+[FormParams]
+category: income
+subcategory: Delete:Me
+HTTP 302
+[Asserts]
+header "location" == "/app/categories/"
+[Captures]
+location: header "location"
+
+GET {{url}}/app/categories/
+HTTP 200
+[Asserts]
+xpath "//table//tr[2]" exists
+xpath "string(//table//tr[2]/td[1])" == "Income"
+xpath "string(//table//tr[2]/td[2])" == "Delete:Me"
+[Captures]
+delete_page: xpath "string(//table//tr[2]//form/@action)"
+id: xpath "string(//table//tr[2]//input[@name='id']/@value)"
+
+POST {{url}}{{delete_page}}
+[FormParams]
+id: {{id}}
+HTTP 302
+[Asserts]
+header "location" == "/app/categories/"
+
+GET {{url}}/app/categories/
+HTTP 200
+[Asserts]
+xpath "//table//tr[2]" not exists
+# Test that the restore form action exists
