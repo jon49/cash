@@ -1,3 +1,9 @@
+# No categories exist so it should redirect to the category creation page
+GET {{url}}/app/transactions/edit/
+HTTP 302
+[Asserts]
+header "location" == "/app/categories/edit/"
+
 GET {{url}}/app/categories/edit/
 HTTP 200
 [Asserts]
