@@ -51,5 +51,5 @@ routerAdd("post", "/app/categories/edit/", e => {
     record.set("category_type", category)
     record.set("name", subcategory)
     $app.save(record)
-    e.redirect(302, `/app/categories`)
+    e.redirect(302, `/app/categories/`)
 })

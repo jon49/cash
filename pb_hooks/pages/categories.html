@@ -2,7 +2,7 @@
 
 {{define "header"}}
 <h2>Categories</h2>
-<a href="/app/categories/edit">Add Category</a>
+<a href="/app/categories/edit/">Add Category</a>
 {{end}}
 
 {{define "main"}}
@@ -21,9 +21,9 @@
         <tr>
             <td>{{.category}}</td>
             <td>{{.subcategory}}</td>
-            <td> <a href="/app/categories/edit?id={{.id}}">Edit</a></td>
+            <td> <a href="/app/categories/edit/?id={{.id}}">Edit</a></td>
             <td>
-                <form method="post" action="/app/categories/delete">
+                <form method="post" action="/app/categories/delete/">
                     <input type="hidden" name="id" value="{{.id}}">
                     <input class="outline secondary m-0 p-0 px-3 fs-1 w-auto" type="submit" aria-label="Delete"
                         value="&times;">
@@ -57,9 +57,9 @@
             <tr>
                 <td>{{.category}}</td>
                 <td>{{.subcategory}}</td>
-                <td><a href="/app/categories/edit?id={{.id}}">Edit</a></td>
+                <td><a href="/app/categories/edit/?id={{.id}}">Edit</a></td>
                 <td>
-                    <form method="post" action="/app/categories/restore">
+                    <form method="post" action="/app/categories/restore/">
                         <input type="hidden" name="id" value="{{.id}}">
                         <input class="m-0 w-auto" type="submit" value="Restore">
                     </form>
