@@ -11,7 +11,7 @@ routerAdd("get", "/app/transactions/edit/", e => {
 
     let records = $app.findRecordsByFilter("categories", `user='${e.get("userId")}'`, "category_type,name")
     if (records.length === 0) {
-        return e.redirect(303, "/app/categories/edit")
+        return e.redirect(302, "/app/categories/edit/")
     }
 
     let { capitalize, formatDate } = require(`${__hooks}/utils.js`)
@@ -23,7 +23,7 @@ routerAdd("get", "/app/transactions/edit/", e => {
     if (id) {
         let transaction = $app.findRecordById("transactions", id)
         if (transaction.get("user") !== e.get("userId")) {
-            return e.redirect(303, "/app/transactions/edit?msg=Unauthorized")
+            return e.redirect(302, "/app/transactions/edit/?msg=Unauthorized")
         }
         let categoryId = transaction.get("category")
         Object.assign(data, {
@@ -61,7 +61,7 @@ routerAdd("post", "/app/transactions/edit/", e => {
         // Update
         transaction = $app.findRecordById("transactions", id)
         if (transaction.get("user") !== userId) {
-            return e.redirect(303, "/app/transactions/edit?msg=Unauthorized")
+            return e.redirect(302, "/app/transactions/edit/?msg=Unauthorized")
         }
     } else {
         // Create
@@ -76,5 +76,5 @@ routerAdd("post", "/app/transactions/edit/", e => {
     transaction.set("category", categoryId)
     $app.save(transaction)
 
-    e.redirect(303, `/app/transactions`)
+    e.redirect(302, `/app/transactions/`)
 })

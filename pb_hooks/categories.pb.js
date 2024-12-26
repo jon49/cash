@@ -3,7 +3,7 @@
 routerAdd("get", "/app/categories/", e => {
     let records = $app.findRecordsByFilter("categories", `user='${e.get("userId")}'`, "category_type,name")
     if (records.length === 0) {
-        return e.redirect(302, "/app/categories/edit")
+        return e.redirect(302, "/app/categories/edit/")
     }
 
     let { capitalize } = require(`${__hooks}/utils.js`)
@@ -34,33 +34,33 @@ routerAdd("post", "/app/categories/delete/", e => {
     // Delete
     let { id } = e.requestInfo().body
     if (!id) {
-        return e.redirect(302, `/app/categories?msg=Category not found!`)
+        return e.redirect(302, `/app/categories/?msg=Category not found!`)
     }
 
     let record = $app.findRecordById("categories", id)
     if (!record) {
-        return e.redirect(302, `/app/categories?msg=Category not found!`)
+        return e.redirect(302, `/app/categories/?msg=Category not found!`)
     }
     record.set("deleted", new Date().toISOString())
 
     $app.save(record)
 
-    return e.redirect(303, `/app/categories`)
+    return e.redirect(302, `/app/categories/`)
 })
 
 routerAdd("post", "/app/categories/restore/", e => {
     // Delete
     let { id } = e.requestInfo().body
     if (!id) {
-        return e.redirect(302, `/app/categories?msg=Category not found!`)
+        return e.redirect(302, `/app/categories/?msg=Category not found!`)
     }
 
     let record = $app.findRecordById("categories", id)
     if (!record) {
-        return e.redirect(302, `/app/categories?msg=Category not found!`)
+        return e.redirect(302, `/app/categories/?msg=Category not found!`)
     }
     record.set("deleted", "")
     $app.save(record)
 
-    return e.redirect(303, `/app/categories`)
+    return e.redirect(302, `/app/categories/`)
 })

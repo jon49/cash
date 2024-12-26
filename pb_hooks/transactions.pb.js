@@ -5,7 +5,7 @@ routerAdd("get", "/app/transactions/", e => {
     let transactions = $app.findRecordsByFilter("transactions", `user='${userId}'`, "-date,-created")
 
     if (transactions.length === 0) {
-        e.redirect(302, "/app/transactions/edit?msg=Create a transaction first.")
+        e.redirect(302, "/app/transactions/edit/?msg=Create a transaction first.")
     }
 
     let categories = $app.findRecordsByFilter("categories", `user='${userId}'`)
@@ -58,33 +58,33 @@ routerAdd("post", "/app/transactions/delete/", e => {
     // Delete
     let { id } = e.requestInfo().body
     if (!id) {
-        return e.redirect(302, `/app/transactions?msg=Transaction not found!`)
+        return e.redirect(302, `/app/transactions/?msg=Transaction not found!`)
     }
 
     let record = $app.findRecordById("transactions", id)
     if (!record) {
-        return e.redirect(302, `/app/transactions?msg=Transaction not found!`)
+        return e.redirect(302, `/app/transactions/?msg=Transaction not found!`)
     }
     record.set("deleted", new Date().toISOString())
 
     $app.save(record)
 
-    return e.redirect(303, `/app/transactions`)
+    return e.redirect(302, `/app/transactions/`)
 })
 
 routerAdd("post", "/app/transactions/restore/", e => {
     // Delete
     let { id } = e.requestInfo().body
     if (!id) {
-        return e.redirect(302, `/app/transactions?msg=Transaction not found!`)
+        return e.redirect(302, `/app/transactions/?msg=Transaction not found!`)
     }
 
     let record = $app.findRecordById("transactions", id)
     if (!record) {
-        return e.redirect(302, `/app/transactions?msg=Transaction not found!`)
+        return e.redirect(302, `/app/transactions/?msg=Transaction not found!`)
     }
     record.set("deleted", "")
     $app.save(record)
 
-    return e.redirect(303, `/app/transactions`)
+    return e.redirect(302, `/app/transactions/`)
 })
