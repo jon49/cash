@@ -1,27 +1,35 @@
 #!/bin/bash
 
-# Check if debug mode is enabled
+# Default values
 DEBUG_MODE=false
-if [ "$2" == "--debug" ]; then
-    DEBUG_MODE=true
-fi
+env="local"
 
-# Get environment argument (argument 1)
-env=$1
-
-# Check if environment is provided
-if [ -z "$env" ]; then
-    env="local"
-fi
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --debug) DEBUG_MODE=true ;;
+        --env) env="$2"; shift ;;
+        --help) 
+            echo "Usage: $0 [--debug] [--env <environment>]"
+            exit 0
+            ;;
+        *) 
+            echo "Unknown parameter passed: $1"
+            echo "Usage: $0 [--debug] [--env <environment>]"
+            exit 1
+            ;;
+    esac
+    shift
+done
 
 # Function to run hurl tests
 run_hurl_tests() {
     local test_file=$1
     if $DEBUG_MODE; then
-        echo "Running $test_file in debug mode..."
+        echo "Running $test_file in debug mode…"
         hurl --verbose "$test_file" --variables-file "$env.env" "${@:2}"
     else
-        echo "Running $test_file..."
+        echo "Running $test_file…"
         hurl "$test_file" --variables-file "$env.env" "${@:2}"
     fi
 }
