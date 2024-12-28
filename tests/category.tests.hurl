@@ -96,4 +96,4 @@ GET {{url}}/app/categories/
 HTTP 200
 [Asserts]
 xpath "//table//tr[2]" not exists
-# Test that the restore form action exists
+xpath "string(//form[@action='/app/categories/restore/']/input[@name='id']/@value)" == "{{id}}"
