@@ -30,7 +30,7 @@ run_hurl_tests() {
         hurl --verbose "$test_file" --variables-file "$env.env" "${@:2}"
     else
         echo "Running $test_file…"
-        hurl "$test_file" --variables-file "$env.env" "${@:2}"
+        hurl "$test_file" --variables-file "$env.env" "${@:2}" --no-output
     fi
 }
 
