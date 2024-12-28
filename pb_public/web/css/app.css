@@ -36,3 +36,7 @@ body {
 .w-auto {
     width: auto !important;
 }
+
+.w-100 {
+    width: 100% !important;
+}

@@ -7,7 +7,7 @@
 {{define "main"}}
 {{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
 
-<form method="post" action="/app/transactions/edit/">
+<form id="transaction-edit-form" method="post" action="/app/transactions/edit/">
     {{if .id}}<input type=hidden name=id value="{{.id}}">{{end}}
     <fieldset class="grid">
         <label>Date*
@@ -23,24 +23,25 @@
     <input type=hidden name=detailId>
     <fieldset data-categories class="grid">
         <label>Category*
-            <select name=categoryId required>
-                {{range .categories}}
-                <option value="{{.id}}" {{if eq $.categoryId .id}}selected{{end}}>{{.category}}</option>
-                {{end}}
-            </select>
+            {{template "select-category" .}}
         </label>
         <label>Amount*
             <input type=number step="0.01" name=amount required value="{{.amount}}" {{if not .edit}}autofocus{{end}}>
         </label>
     </fieldset>
 
-    <div class="grid reverse">
-        <button type=submit style="margin:0">Save</button>
-        <!-- <button>Add Detail</button> -->
-        <a role="button" href="/app/categories/edit/">Add Category</a>
-    </div>
 </form>
+
+<div class="grid reverse">
+    <button form="transaction-edit-form" type=submit style="margin:0">Save</button>
+    <!-- <button>Add Detail</button> -->
+    <form action="/app/categories/edit/" hf-target="#dialog">
+        <button class="w-100">Add Category</button>
+    </form>
+</div>
+
 <br>
 <p><small>* required</small></p>
 <script src="/web/js/html-form.min.js"></script>
+<div id="dialog"></div>
 {{end}}

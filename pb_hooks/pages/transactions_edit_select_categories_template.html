@@ -1,0 +1,7 @@
+{{define "select-category"}}
+<select id="select-category" name=categoryId required>
+    {{range .categories}}
+    <option value="{{.id}}" {{if eq $.categoryId .id}}selected{{end}}>{{.category}}</option>
+    {{end}}
+</select>
+{{end}}

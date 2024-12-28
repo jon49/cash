@@ -9,16 +9,11 @@ routerAdd("get", "/app/transactions/edit/", e => {
         msg: e.request.url.query().get("msg"),
     }
 
-    let records = $app.findRecordsByFilter("categories", `user='${e.get("userId")}'`, "category_type,name")
-    if (records.length === 0) {
+    let { getCategorySelectData } = require(`${__hooks}/transactions_edit.js`)
+    data.categories = getCategorySelectData(e, $app)
+    if (data.categories.length === 0) {
         return e.redirect(302, "/app/categories/edit/")
     }
-
-    let { capitalize, formatDate } = require(`${__hooks}/utils.js`)
-    data.categories = records.map(x => ({
-        category: `${capitalize(x.get("category_type"))} - ${x.get("name")}`,
-        id: x.id,
-    }))
 
     if (id) {
         let transaction = $app.findRecordById("transactions", id)
@@ -26,6 +21,7 @@ routerAdd("get", "/app/transactions/edit/", e => {
             return e.redirect(302, "/app/transactions/edit/?msg=Unauthorized")
         }
         let categoryId = transaction.get("category")
+        let { formatDate } = require(`${__hooks}/utils.js`)
         Object.assign(data, {
             id,
             header: "Edit Transaction",
@@ -47,6 +43,7 @@ routerAdd("get", "/app/transactions/edit/", e => {
     const html = $template.loadFiles(
         `${__hooks}/pages/layout.html`,
         `${__hooks}/pages/transactions_edit.html`,
+        `${__hooks}/pages/transactions_edit_select_categories_template.html`,
     ).render(data)
 
     return e.html(200, html)

@@ -23,11 +23,16 @@ routerAdd("get", "/app/categories/edit/", e => {
         })
     }
 
-    const html = $template.loadFiles(
-        `${__hooks}/pages/layout.html`,
-        `${__hooks}/pages/categories_edit.html`,
-        `${__hooks}/pages/category_form.html`,
-    ).render(data)
+    let html = (e.request.header.get("HF-Request") === "true")
+        ? $template.loadFiles(
+            `${__hooks}/pages/transaction_category_edit_form.html`,
+            `${__hooks}/pages/category_form.html`,
+        ).render(data)
+        : $template.loadFiles(
+            `${__hooks}/pages/layout.html`,
+            `${__hooks}/pages/categories_edit.html`,
+            `${__hooks}/pages/category_form.html`,
+        ).render(data)
 
     return e.html(200, html)
 })
@@ -51,5 +56,19 @@ routerAdd("post", "/app/categories/edit/", e => {
     record.set("category_type", category)
     record.set("name", subcategory)
     $app.save(record)
+
+    if (e.request.header.get("HF-Request") === "true") {
+        let { getCategorySelectData } = require(`${__hooks}/transactions_edit.js`)
+        let data = {
+            categories: getCategorySelectData(e, $app),
+            categoryId: record.id,
+        }
+        let html = $template.loadFiles(
+            `${__hooks}/pages/transactions_edit_select_categories.html`,
+            `${__hooks}/pages/transactions_edit_select_categories_template.html`,
+        ).render(data)
+        return e.html(200, html)
+    }
+
     e.redirect(302, `/app/categories/`)
 })

@@ -1,6 +1,6 @@
 {{define "category-form"}}
 {{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
-<form id=categoryForm method="post" action="/app/categories/edit/">
+<form id=categoryForm method="post" action="/app/categories/edit/" hf-target="#select-category" hf-swap="outerHTML">
     {{if .id}}<input type="hidden" name=id value="{{.id}}">{{end}}
     <fieldset class=grid>
         <label>Category
