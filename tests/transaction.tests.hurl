@@ -1,3 +1,6 @@
+### Test the transaction flow ###
+
+### Create a new transaction ###
 GET {{url}}/app/transactions/edit/
 HTTP 200
 [Asserts]
@@ -38,6 +41,8 @@ xpath "string(//table//tfoot/tr[1])" contains "($100.00)"
 [Captures]
 edit_page: xpath "string(//table//tr[1]/td[1]/a/@href)"
 
+### Edit the transaction ###
+
 GET {{url}}{{edit_page}}
 HTTP 200
 [Asserts]
@@ -71,6 +76,8 @@ xpath "string(//table//tr[1]/td[5]/form/@action)" == "/app/transactions/delete/"
 xpath "string(//table//tfoot/tr[1])" contains "Total"
 xpath "string(//table//tfoot/tr[1])" contains "($100.00)"
 
+### Delete the transaction ###
+
 POST {{url}}/app/transactions/delete/
 [FormParams]
 id: {{id}}
@@ -87,6 +94,8 @@ xpath "string(//summary)" contains "View Deleted Transactions"
 xpath "string(//tbody/tr[1]/td[1]/a)" contains "2024-12-31"
 xpath "string(//table//tr[1]/td[5]/form/@action)" == "/app/transactions/restore/"
 xpath "//table//tfoot" not exists
+
+### Restore the transaction ###
 
 POST {{url}}/app/transactions/restore/
 [FormParams]

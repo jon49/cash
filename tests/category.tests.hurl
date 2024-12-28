@@ -1,8 +1,12 @@
+### Test the categories flow ###
+
 # No categories exist so it should redirect to the category creation page
 GET {{url}}/app/transactions/edit/
 HTTP 302
 [Asserts]
 header "location" == "/app/categories/edit/"
+
+### It should be able to create a category ###
 
 GET {{url}}/app/categories/edit/
 HTTP 200
@@ -46,7 +50,7 @@ xpath "//form//input[@name='id']" exists
 [Captures]
 id: xpath "string(//form//input[@name='id']/@value)"
 
-# Make sure you can edit the category
+### Make sure you can edit the category ###
 POST {{url}}/app/categories/edit/
 [FormParams]
 category: expense
