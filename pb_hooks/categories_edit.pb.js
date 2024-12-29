@@ -30,12 +30,12 @@ routerAdd("get", "/app/categories/edit/", e => {
     let html = (isHFRequest)
         ? $template.loadFiles(
             `${__hooks}/pages/transaction_category_edit_form.html`,
-            `${__hooks}/pages/category_form.html`,
+            `${__hooks}/pages/categories_edit_form_template.html`,
         ).render(data)
         : $template.loadFiles(
             `${__hooks}/pages/layout.html`,
             `${__hooks}/pages/categories_edit.html`,
-            `${__hooks}/pages/category_form.html`,
+            `${__hooks}/pages/categories_edit_form_template.html`,
         ).render(data)
 
     return e.html(200, html)
