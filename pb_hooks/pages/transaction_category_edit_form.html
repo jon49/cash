@@ -1,7 +1,14 @@
 <x-modal>
     <dialog>
         <article>
-            {{template "category-form" .}}
+            <header>
+                <button aria-label="Close" rel="prev" form="cancel-dialog"></button>
+                <p><strong>New Category</strong></p>
+            </header>
+            <div>
+                {{template "category-form" .}}
+            </div>
         </article>
+        <form id="cancel-dialog" method="dialog"></form>
     </dialog>
 </x-modal>

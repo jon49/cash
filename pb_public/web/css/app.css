@@ -40,3 +40,7 @@ body {
 .w-100 {
     width: 100% !important;
 }
+
+.text-end {
+    text-align: end !important;
+}

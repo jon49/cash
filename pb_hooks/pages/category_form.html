@@ -15,13 +15,11 @@
     </fieldset>
 </form>
 
-<footer class="grid reverse">
-    <button type=submit form=categoryForm style="margin: 0;">Save</button>
+<footer class="text-end">
     {{if .modal}}
-    <form method=dialog class=grid>
-        <button class=secondary value=cancel>Cancel</button>
-    </form>
+    <button form="cancel-dialog" class=secondary>Cancel</button>
     {{end}}
+    <button form=categoryForm>Save</button>
     {{if .edit}}
     <a href="/app/categories/edit/" role="button">Add Another Category</a>
     {{end}}

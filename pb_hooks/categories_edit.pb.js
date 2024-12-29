@@ -3,12 +3,16 @@
 routerAdd("get", "/app/categories/edit/", e => {
     let id = e.request.url.query().get("id")
     let msg = e.request.url.query().get("msg")
+    let isHFRequest = e.request.header.get("HF-Request") === "true"
+
     let data = {
         header: "New Category",
         get title() { return this.header },
         edit: false,
         msg,
+        modal: isHFRequest,
     }
+
     if (id) {
         let record = $app.findRecordById("categories", id)
         if (record.get("user") !== e.get("userId")) {
@@ -23,7 +27,7 @@ routerAdd("get", "/app/categories/edit/", e => {
         })
     }
 
-    let html = (e.request.header.get("HF-Request") === "true")
+    let html = (isHFRequest)
         ? $template.loadFiles(
             `${__hooks}/pages/transaction_category_edit_form.html`,
             `${__hooks}/pages/category_form.html`,
