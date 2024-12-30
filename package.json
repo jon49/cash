@@ -1,0 +1,23 @@
+{
+  "name": "cash",
+  "version": "1.0.0",
+  "description": "Cash tracking application which exports to csv.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "esbuild src/app/sw.ts --watch --bundle --outfile=pb_public/app/sw.js --format=iife",
+    "build": "esbuild src/app/sw.ts --entry-names=[dir]/[name].[hash] --outbase=src/app --bundle --outdir=dist/public/web/js --minify --format=iife",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jon Nyman",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/serviceworker": "^0.0.108",
+    "esbuild": "^0.24.2"
+  },
+  "dependencies": {
+    "idb-keyval": "^6.2.1"
+  }
+}

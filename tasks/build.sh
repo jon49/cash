@@ -2,6 +2,7 @@
 
 rm -rf dist
 mkdir dist
+
 cp -r pb_hooks dist/pb_hooks
 
 mkdir dist/public
@@ -50,3 +51,11 @@ for dist_html_file in dist/pb_hooks/pages/*.html; do
         fi
     done < $dist_html_file
 done
+
+# Service worker build
+npm run build
+sw_file="dist/public/app/sw.js"
+# Find the hashed service worker file
+sw_js_file=$(find dist/public/web/js -name 'sw.*.js' | head -n 1 | sed 's|dist/public||')
+
+echo "importScripts('$sw_js_file')" > $sw_file

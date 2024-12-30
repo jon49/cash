@@ -23,6 +23,9 @@
                             alt="Cash Tracker Logo"></img>
                     </a>
                 </li>
+                {{if not .loggedOut}}
+                <li id="sync" hidden><button>Sync Data</button></li>
+                {{end}}
             </ul>
             {{if not .loggedOut}}
             <input type="checkbox" id="hamburger" />

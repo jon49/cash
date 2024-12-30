@@ -134,3 +134,39 @@ class xModal extends HTMLElement {
 }
 
 window.customElements.define('x-modal', xModal)
+
+if (location.pathname === "/app/transactions/edit/" && location.search === "" && 'serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/app/sw.js', { updateViaCache: 'imports' }).then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }).catch(error => {
+            console.log('ServiceWorker registration failed: ', error);
+        });
+    });
+}
+
+async function checkSyncStatus() {
+    if (navigator?.serviceWorker?.controller) {
+        const messageChannel = new MessageChannel()
+        messageChannel.port1.onmessage = (event) => {
+            let syncEl = document.getElementById("sync")
+            if (event.data.hasPendingSync) {
+                let syncButton = syncEl?.querySelector("button")
+                if (!syncButton) return
+                syncEl.hidden = false
+                syncButton.addEventListener("click", () => {
+                    navigator.serviceWorker.ready.then((registration) => {
+                        registration.sync.register("syncPostRequests")
+                    })
+                })
+            } else {
+                if (syncEl) {
+                    syncEl.hidden = true
+                }
+            }
+        }
+        navigator.serviceWorker.controller.postMessage({ type: "CHECK_SYNC_STATUS" }, [messageChannel.port2])
+    }
+}
+
+checkSyncStatus()
