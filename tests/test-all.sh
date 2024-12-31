@@ -27,9 +27,11 @@ run_hurl_tests() {
     local test_file=$1
     if $DEBUG_MODE; then
         echo "Running $test_file in debug mode…"
+        echo "hurl --verbose \"$test_file\" --variables-file \"$env.env\" \"${@:2}\""
         hurl --verbose "$test_file" --variables-file "$env.env" "${@:2}"
     else
         echo "Running $test_file…"
+        echo "hurl \"$test_file\" --variables-file \"$env.env\" \"${@:2}\" --no-output"
         hurl "$test_file" --variables-file "$env.env" "${@:2}" --no-output
     fi
 }
