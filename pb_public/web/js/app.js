@@ -145,28 +145,25 @@ if (location.pathname === "/app/transactions/edit/" && location.search === "" &&
     });
 }
 
-async function checkSyncStatus() {
-    if (navigator?.serviceWorker?.controller) {
-        const messageChannel = new MessageChannel()
-        messageChannel.port1.onmessage = (event) => {
-            let syncEl = document.getElementById("sync")
-            if (event.data.hasPendingSync) {
-                let syncButton = syncEl?.querySelector("button")
-                if (!syncButton) return
-                syncEl.hidden = false
-                syncButton.addEventListener("click", () => {
-                    navigator.serviceWorker.ready.then((registration) => {
-                        registration.sync.register("syncPostRequests")
-                    })
+// Check if there are any posts that need syncing.
+if (navigator?.serviceWorker?.controller) {
+    const messageChannel = new MessageChannel()
+    messageChannel.port1.onmessage = (event) => {
+        let syncEl = document.getElementById("sync")
+        if (event.data.hasPendingSync) {
+            let syncButton = syncEl?.querySelector("button")
+            if (!syncButton) return
+            syncEl.hidden = false
+            syncButton.addEventListener("click", () => {
+                navigator.serviceWorker.ready.then((registration) => {
+                    registration.sync.register("syncPostRequests")
                 })
-            } else {
-                if (syncEl) {
-                    syncEl.hidden = true
-                }
+            })
+        } else {
+            if (syncEl) {
+                syncEl.hidden = true
             }
         }
-        navigator.serviceWorker.controller.postMessage({ type: "CHECK_SYNC_STATUS" }, [messageChannel.port2])
     }
+    navigator.serviceWorker.controller.postMessage({ type: "CHECK_SYNC_STATUS" }, [messageChannel.port2])
 }
-
-checkSyncStatus()
