@@ -22,10 +22,14 @@ export function handleEvent(context, event) {
     let targetAttribute = `x-${event.type}`
     if (target instanceof HTMLElement) {
         let targetQuery = `[${targetAttribute}]`
-        /** @type {string | undefined | null} */
-        let action =
-            target.querySelector(targetQuery)?.getAttribute(targetAttribute)
-            || target.closest(targetQuery)?.getAttribute(targetAttribute)
+        let action
+        try {
+            /** @type {string | undefined | null} */
+            action =
+                target.querySelector(targetQuery)?.getAttribute(targetAttribute)
+                || target.closest(targetQuery)?.getAttribute(targetAttribute)
+        } catch (_) { }
+
         if (action) {
             if ((context)[action] instanceof Function) {
                 stopEvent(event)
@@ -93,6 +97,7 @@ class xModal extends HTMLElement {
         this.dialog.addEventListener('close', this)
         this.dialog.addEventListener('click', this)
         this.box = this.dialog.querySelector("[box]")
+        this.addEventListener('hf:completed', this)
     }
 
     /** @param {Event} event */
@@ -104,11 +109,16 @@ class xModal extends HTMLElement {
         this.handleclose()
     }
 
+    "handlehf:completed"() {
+        this.handleclose()
+    }
+
     handleclose() {
         this.html.classList.add('modal-is-closing')
         setTimeout(() => {
             this.html.classList.remove('modal-is-open', 'modal-is-closing')
             this.dialog?.close()
+            this.remove()
         }, this.animation)
     }
 
