@@ -30,6 +30,12 @@ git clone https://github.com/jon49/cash.git
 cd <cloned directory>
 ```
 
+### Images
+
+Include the images. You can download the images here
+<http://cash.jnyman.com/web/images.tar.xz> and unzip them in the directory
+`pb_public/web/images`.
+
 ### Start the application
 
 Delete any files in the `pb_migrations` directory.
