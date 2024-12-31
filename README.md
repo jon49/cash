@@ -1,5 +1,7 @@
 # Cash Tracking Application
 
+![Application Screenshot](https://github.com/user-attachments/assets/172929b0-4bff-4771-b3db-be44aec0c661)
+
 ## About
 
 This application was built to keep track of cash transactions and to be able to
