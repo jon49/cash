@@ -42,7 +42,7 @@ routerAdd("post", "/login", e => {
     }
 })
 
-routerAdd("get", "/app/logout", e => {
+routerAdd("get", "/app/logout/", e => {
     let sessionCookie = e.request.cookie("session")
     let session = sessionCookie?.value
     if (!session) return e.redirect(302, "/")
