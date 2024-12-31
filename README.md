@@ -64,6 +64,25 @@ If you would like to change the service worker file do so by changing the
 `src/app/sw.ts` file. make sure to run the `npm i` command and then `npm start`
 to get started.
 
+### Testing
+
+Make sure you have the service running (`./tasks/start.sh`). Add the file
+`local.env` to the `tests` directory. It should contain a test email and
+password of your choosing:
+
+```env
+password=12345678
+email=tester@example.com
+url=http://127.0.0.1:8090
+```
+
+Make sure you have [Hurl](https://hurl.dev/) `6.0.0` installed. To run the tests
+run the command, `./tests/test-all.sh`.
+
+Note the caveat given in the FAQ in the Hurl documentation for Hurl about Mac
+computers and libcurl caveats. I don't have a Mac so I don't know if it really
+matters for the current test set up.
+
 ## Running in Production
 
 TODO: Add docs for this.
