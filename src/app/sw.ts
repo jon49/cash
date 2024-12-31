@@ -1,19 +1,16 @@
-import { get, set } from "idb-keyval"
+import { get, set, update } from "idb-keyval"
 
-let cacheVersion = "v2"
+let cacheVersion = "v1"
 
-let pathsToCache = [
-    "/app/transactions/edit/",
+let alwaysCache = [
     "/app/categories/edit/",
 ]
 
-self.addEventListener("install", (e) => {
-    return e.waitUntil(
-        caches.open(cacheVersion).then((cache) => {
-            return cache.addAll(pathsToCache)
-        })
+self.addEventListener("install", (e: ExtendableEvent) =>
+    e.waitUntil(
+        caches.open(cacheVersion).then(cache => cache.addAll(alwaysCache))
     )
-})
+)
 
 self.addEventListener("activate",
     async (e: ExtendableEvent) => {
@@ -27,10 +24,11 @@ self.addEventListener("activate",
 
 self.addEventListener("fetch",
     async (e: FetchEvent) => {
+        let url = new URL(e.request.url)
+        console.log("Fetching", e.request.method, url.pathname)
+
         if (e.request.method === "GET") {
-            let url = new URL(e.request.url)
-            // Cache all file and specific paths
-            if (isFile(url) || pathsToCache.some(path => e.request.url.includes(path))) {
+            if (isFile(url) || alwaysCache.includes(url.pathname)) {
                 let isHFRequest = e.request.headers.get("HF-Request") === "true"
                 let hfUrl = ""
                 if (isHFRequest) {
@@ -80,33 +78,30 @@ self.addEventListener("fetch",
         }
 
         if (e.request.method === "POST") {
-            e.respondWith(
-                fetch(e.request.clone()).catch(() => {
-                    return new Response(null, { status: 503, statusText: "Service Unavailable" })
-                })
-            )
-
+            // Save the request for later
             e.waitUntil(
-                fetch(e.request.clone()).catch(() => {
-                    return savePostRequest(e.request.clone())
+                fetch(e.request.clone()).catch(async () => {
+                    await savePostRequest(e.request.clone())
+                    return new Response(null, { status: 503, statusText: "Service Unavailable" })
                 })
             )
             return
         }
-
-        if (e.request.method === "PUT" || e.request.method === "DELETE") {
-            e.respondWith(
-                fetch(e.request.clone()).catch(() => {
-                    return new Response(null, { status: 503, statusText: "Service Unavailable" })
-                })
-            )
-        }
     })
 
 self.addEventListener("message", async (event) => {
-    if (event.data && event.data.type === "CHECK_SYNC_STATUS") {
-        let posts = await get("postRequests") ?? []
-        event.ports[0].postMessage({ hasPendingSync: posts.length > 0 })
+    let data = event.data
+    if (!data?.type) return
+    switch (data.type) {
+        case "CHECK_SYNC_STATUS":
+            let posts = await get("postRequests") ?? []
+            event.ports[0].postMessage({ hasPendingSync: posts.length > 0 })
+            break
+        case "CLEAR_CACHE":
+            await caches.delete(cacheVersion)
+            break
+        default:
+            break
     }
 })
 

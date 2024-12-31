@@ -30,18 +30,16 @@
   }
 
   // src/app/sw.ts
-  var cacheVersion = "v2";
-  var pathsToCache = [
-    "/app/transactions/edit/",
+  var cacheVersion = "v1";
+  var alwaysCache = [
     "/app/categories/edit/"
   ];
-  self.addEventListener("install", (e) => {
-    return e.waitUntil(
-      caches.open(cacheVersion).then((cache) => {
-        return cache.addAll(pathsToCache);
-      })
-    );
-  });
+  self.addEventListener(
+    "install",
+    (e) => e.waitUntil(
+      caches.open(cacheVersion).then((cache) => cache.addAll(alwaysCache))
+    )
+  );
   self.addEventListener(
     "activate",
     async (e) => {
@@ -53,9 +51,10 @@
   self.addEventListener(
     "fetch",
     async (e) => {
+      let url = new URL(e.request.url);
+      console.log("Fetching", e.request.method, url.pathname);
       if (e.request.method === "GET") {
-        let url = new URL(e.request.url);
-        if (isFile(url) || pathsToCache.some((path) => e.request.url.includes(path))) {
+        if (isFile(url) || alwaysCache.includes(url.pathname)) {
           let isHFRequest = e.request.headers.get("HF-Request") === "true";
           let hfUrl = "";
           if (isHFRequest) {
@@ -99,31 +98,29 @@
         return;
       }
       if (e.request.method === "POST") {
-        e.respondWith(
-          fetch(e.request.clone()).catch(() => {
-            return new Response(null, { status: 503, statusText: "Service Unavailable" });
-          })
-        );
         e.waitUntil(
-          fetch(e.request.clone()).catch(() => {
-            return savePostRequest(e.request.clone());
+          fetch(e.request.clone()).catch(async () => {
+            await savePostRequest(e.request.clone());
+            return new Response(null, { status: 503, statusText: "Service Unavailable" });
           })
         );
         return;
       }
-      if (e.request.method === "PUT" || e.request.method === "DELETE") {
-        e.respondWith(
-          fetch(e.request.clone()).catch(() => {
-            return new Response(null, { status: 503, statusText: "Service Unavailable" });
-          })
-        );
-      }
     }
   );
   self.addEventListener("message", async (event) => {
-    if (event.data && event.data.type === "CHECK_SYNC_STATUS") {
-      let posts = await get("postRequests") ?? [];
-      event.ports[0].postMessage({ hasPendingSync: posts.length > 0 });
+    let data = event.data;
+    if (!data?.type) return;
+    switch (data.type) {
+      case "CHECK_SYNC_STATUS":
+        let posts = await get("postRequests") ?? [];
+        event.ports[0].postMessage({ hasPendingSync: posts.length > 0 });
+        break;
+      case "CLEAR_CACHE":
+        await caches.delete(cacheVersion);
+        break;
+      default:
+        break;
     }
   });
   async function savePostRequest(request) {
