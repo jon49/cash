@@ -1,0 +1,38 @@
+{{define "title"}}Settings{{end}}
+
+{{define "header"}}
+<h2>Settings</h2>
+{{end}}
+
+{{define "main"}}
+{{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
+
+<form method="post" action="/app/settings/" hf-target="#currencyMsg" onchange="this.requestSubmit()">
+    <input type=hidden name="id" value="currency">
+    <div id="currencyMsg">{{if .currencyMsg}}<p class="msg">{{.currencyMsg}}</p>{{end}}</div>
+    <label>Currency*
+        <input type="text" name="value" value="{{.currency}}" required autocomplete="off" hf-focus-skip>
+    </label>
+    <noscript>
+        <button type=submit>Save</button>
+    </noscript>
+</form>
+
+<form method="post" action="/app/settings/" hf-target="#replacementTextMsg" onchange="this.requestSubmit()">
+    <input type=hidden name="id" value="replacementText">
+    <div id="replacementTextMsg">{{if .replacementTextMsg}}<p class="msg">{{.replacementTextMsg}}</p>{{end}}</div>
+    <label>Replacement Text
+        <input type="text" name="value" value="{{.replacementText}}" placeholder="old->new" autocomplete="off"
+            hf-focus-skip>
+        <small>Find and replace are separated with "->". Separate multiple with "|" character. E.g.,
+            `^expense->Expense|^income->Income`.</small>
+    </label>
+    <noscript>
+        <button type=submit>Save</button>
+    </noscript>
+</form>
+
+<br>
+<p><small>* required</small></p>
+<script src="/web/js/html-form.min.js" type="module"></script>
+{{end}}

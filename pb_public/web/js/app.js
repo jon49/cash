@@ -145,6 +145,23 @@ class xModal extends HTMLElement {
 
 window.customElements.define('x-modal', xModal)
 
+// x-delete element that removes itself after a timeout depending on how long the message is.
+class xDelete extends HTMLElement {
+    timeout = 3e3
+    connectedCallback() {
+        this.init()
+    }
+
+    init() {
+        let wordCount = this.textContent?.split(" ").length
+        setTimeout(() => {
+            this.remove()
+        }, this.timeout + (wordCount * 100))
+    }
+}
+
+window.customElements.define('x-delete', xDelete)
+
 if (location.pathname === "/app/transactions/edit/" && location.search === "" && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/app/sw.js', { updateViaCache: 'imports' }).then(registration => {
