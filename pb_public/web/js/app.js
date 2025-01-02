@@ -54,11 +54,13 @@ customElements.define("date-fill",
             let el = this.firstElementChild
             let value = el?.value
             if (value?.length > 0) return
-            let today = new Date()
-            let formattedDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
-            el.value = formattedDate;
+            el.value = formatDate(new Date());
         }
     })
+
+function formatDate(today) {
+    return `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}`
+}
 
 // PicoCSS Modal
 class xModal extends HTMLElement {
