@@ -61,7 +61,7 @@
             hfUrl = `/hf${url.pathname}${url.search}`;
           }
           let pathname = `${url.pathname}${url.search}`;
-          e.respondWith(
+          return e.respondWith(
             caches.match(isHFRequest ? hfUrl : pathname).then((response) => {
               if (!response) {
                 return fetch(e.request).then(async (networkResponse) => {
@@ -76,9 +76,8 @@
               return response;
             })
           );
-          return;
         }
-        e.respondWith(
+        return e.respondWith(
           // @ts-ignore
           fetch(e.request).then((response) => {
             let responseClone = response.clone();
@@ -95,16 +94,16 @@
             }
           })
         );
-        return;
       }
       if (e.request.method === "POST") {
-        e.waitUntil(
-          fetch(e.request.clone()).catch(async () => {
-            await savePostRequest(e.request.clone());
-            return new Response(null, { status: 503, statusText: "Service Unavailable" });
-          })
-        );
-        return;
+        let clonedRequest = e.request.clone();
+        e.respondWith(fetch(e.request).catch(async () => {
+          await savePostRequest(clonedRequest);
+          return new Response("No internet is available currently.", {
+            status: 200,
+            headers: { "Content-Type": "text/html" }
+          });
+        }));
       }
     }
   );
