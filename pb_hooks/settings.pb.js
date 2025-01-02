@@ -26,37 +26,25 @@ routerAdd("get", "/app/settings/", e => {
 })
 
 routerAdd("post", "/app/settings/", e => {
-    console.log("POST /app/settings/")
     let { value, id } = e.requestInfo().body
     let userId = e.get("userId")
 
-    let record
-    try {
-        record = $app.findFirstRecordByFilter("settings", `user='${userId}' && name='${id}'`)
-    } catch (_) { }
+    let record = $app.findRecordsByFilter("settings", `user='${userId}' && name='${id}'`, void 0, 1)[0]
 
-    console.log("RECORD 0", record)
     if (!record) {
-        console.log("RECORD 1")
         let collection = $app.findCollectionByNameOrId("settings")
         record = new Record(collection)
         record.set("user", userId)
         record.set("name", id)
         record.set("value", value)
-        console.log("RECORD 2", record)
     } else {
         record.set("value", value)
-        console.log("RECORD 3", record)
     }
 
-    console.log("SAVE!")
     $app.save(record)
 
-    console.log("RETURN")
     if (e.request.header.get("HF-Request") === "true") {
-        console.log("RETURN 1")
         return e.html(200, `<x-delete><p class=msg>Saved!</p></x-delete>`)
     }
-    console.log("RETURN 2")
     return e.redirect(302, `/app/settings/?${id}Msg=Saved!`)
 })

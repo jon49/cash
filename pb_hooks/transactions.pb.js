@@ -10,12 +10,7 @@ routerAdd("get", "/app/transactions/", e => {
 
     let categories = $app.findRecordsByFilter("categories", `user='${userId}'`)
 
-
-    let currencySymbol = "$"
-    try {
-        let record = $app.findFirstRecordByFilter("settings", `user='${userId}' && name='currency'`)
-        currencySymbol = record.get("value")
-    } catch (_) { }
+    let currencySymbol = $app.findRecordsByFilter("settings", `user='${userId}' && name='currency'`, void 0, 1)[0]?.get("value") ?? "$"
 
     let { capitalize, formatDate, formatMoney } = require(`${__hooks}/utils.js`)
 

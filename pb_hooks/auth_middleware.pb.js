@@ -8,10 +8,8 @@ routerUse(e => {
     let session = sessionCookie?.value
     if (!session) return e.redirect(302, "/login")
 
-    let sessionRecord
-    try {
-        sessionRecord = $app.findRecordById("sessions", session)
-    } catch (_) {
+    let sessionRecord = $app.findRecordsByFilter("sessions", `id = '${session}'`, void 0, 1)[0]
+    if (!sessionRecord) {
         return e.redirect(302, "/login")
     }
 
