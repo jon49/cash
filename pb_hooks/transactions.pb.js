@@ -10,10 +10,14 @@ routerAdd("get", "/app/transactions/", e => {
 
     let categories = $app.findRecordsByFilter("categories", `user='${userId}'`)
 
-    function formatAmountView(amount) {
-        return amount < 0 ? `($${Math.abs(amount).toFixed(2)})` : `$${amount.toFixed(2)}`
-    }
-    let { capitalize, formatDate } = require(`${__hooks}/utils.js`)
+
+    let currencySymbol = "$"
+    try {
+        let record = $app.findFirstRecordByFilter("settings", `user='${userId}' && name='currency'`)
+        currencySymbol = record.get("value")
+    } catch (_) { }
+
+    let { capitalize, formatDate, formatMoney } = require(`${__hooks}/utils.js`)
 
     let allTransactions = transactions.map(transaction => {
         let date = formatDate(transaction.get("date"))
@@ -25,7 +29,7 @@ routerAdd("get", "/app/transactions/", e => {
             date,
             description: transaction.get("description"),
             amount,
-            amountView: formatAmountView(amount),
+            amountView: formatMoney(amount, currencySymbol),
             category: categoryName,
             deleted: transaction.get("deleted").toString(),
         }
@@ -40,11 +44,11 @@ routerAdd("get", "/app/transactions/", e => {
 
     data.hasDeleted = data.deletedTransactions.length > 0
     data.hasTransactions = data.transactions.length > 0
-    data.total = formatAmountView(data.transactions.reduce((sum, transaction) => {
+    data.total = formatMoney(data.transactions.reduce((sum, transaction) => {
         return (transaction.category.startsWith("Income"))
             ? sum + transaction.amount
             : sum + transaction.amount
-    }, 0))
+    }, 0), currencySymbol)
 
     const html = $template.loadFiles(
         `${__hooks}/pages/layout.html`,

@@ -11,5 +11,8 @@ module.exports = {
     },
     formatDate: (date) => {
         return date.string().slice(0, 10)
+    },
+    formatMoney: (amount, currencySymbol) => {
+        return amount < 0 ? `(${currencySymbol}${Math.abs(amount).toFixed(2)})` : `${currencySymbol}${amount.toFixed(2)}`
     }
 }
