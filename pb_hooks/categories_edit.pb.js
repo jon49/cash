@@ -58,7 +58,7 @@ routerAdd("post", "/app/categories/edit/", e => {
 
     record.set("user", userId)
     record.set("category_type", category)
-    record.set("name", subcategory)
+    record.set("name", subcategory.trim())
     $app.save(record)
 
     if (e.request.header.get("HF-Request") === "true") {

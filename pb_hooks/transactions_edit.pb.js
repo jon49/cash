@@ -68,7 +68,7 @@ routerAdd("post", "/app/transactions/edit/", e => {
     }
 
     transaction.set("date", date)
-    transaction.set("description", description)
+    transaction.set("description", description.trim())
     transaction.set("amount", +amount)
     transaction.set("category", categoryId)
     $app.save(transaction)

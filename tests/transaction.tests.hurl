@@ -17,7 +17,7 @@ category_id: xpath "string(//form//select[@name='categoryId']/option[1]/@value)"
 
 POST {{url}}/app/transactions/edit/
 [FormParams]
-description: Out to lunch with my wife.
+description:       Out to lunch with my wife.      
 date: 2024-12-31
 categoryId: {{category_id}}
 amount: 100

@@ -21,7 +21,7 @@ xpath "//form//input[@name='id']" not exists
 POST {{url}}/app/categories/edit/
 [FormParams]
 category: expense
-subcategory: Dinings
+subcategory:   Dinings   
 HTTP 302
 [Asserts]
 header "location" == "/app/categories/"
