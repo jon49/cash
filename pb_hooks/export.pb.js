@@ -18,9 +18,22 @@ routerAdd("post", "/app/export/", e => {
     let transactions = $app.findRecordsByFilter("transactions", `user='${userId}' && deleted=''`, "-date,-created")
     let categories = $app.findRecordsByFilter("categories", `user='${userId}'`)
 
+    let replacementText = $app.findRecordsByFilter("settings", `user='${userId}' && name='replacementText'`)[0]?.get("value") ?? ""
+    let replacer = replacementText.split("|")
+        .map(x => {
+            if (!x) return
+            let [reg, text] = x.trim().split("->")
+            return [new RegExp(reg, "g"), text]
+        })
+        .filter(x => x)
+
     let transactionViews = transactions.map(transaction => {
         let category = categories.find(category => category.id === transaction.get("category"))
-        return `${transaction.get("date").toString().slice(0, 10)},"${transaction.get("description").replace('"', '\\"')}",${transaction.get("amount")},${category.get("category_type")}:${category.get("name")}`
+        let categoryView = `${category.get("category_type")}:${category.get("name")}`
+        for (let [reg, text] of replacer) {
+            categoryView = categoryView.replace(reg, text)
+        }
+        return `${transaction.get("date").toString().slice(0, 10)},"${transaction.get("description").replace('"', '\\"')}",${transaction.get("amount")},${categoryView}`
     })
 
     let csv = `Date,Description,Amount,Category\n${transactionViews.join("\n")}`

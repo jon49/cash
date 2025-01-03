@@ -31,6 +31,8 @@ routerAdd("post", "/app/settings/", e => {
 
     let record = $app.findRecordsByFilter("settings", `user='${userId}' && name='${id}'`, void 0, 1)[0]
 
+    value = value.trim()
+
     if (!record) {
         let collection = $app.findCollectionByNameOrId("settings")
         record = new Record(collection)
