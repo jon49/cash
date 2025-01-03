@@ -8,6 +8,9 @@ cp -r pb_hooks dist/pb_hooks
 mkdir dist/public
 cp -r pb_public/* dist/public
 
+mkdir dist/pb_migrations
+cp -r pb_migrations/* dist/pb_migrations
+
 # Function to generate MD5 hash for a file
 generate_md5_hash() {
     local file=$1
