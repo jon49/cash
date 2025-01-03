@@ -52,7 +52,6 @@
     "fetch",
     async (e) => {
       let url = new URL(e.request.url);
-      console.log("Fetching", e.request.method, url.pathname);
       if (e.request.method === "GET") {
         if (isFile(url) || alwaysCache.includes(url.pathname)) {
           let isHFRequest = e.request.headers.get("HF-Request") === "true";

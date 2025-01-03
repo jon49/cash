@@ -25,7 +25,6 @@ self.addEventListener("activate",
 self.addEventListener("fetch",
     async (e: FetchEvent) => {
         let url = new URL(e.request.url)
-        console.log("Fetching", e.request.method, url.pathname)
 
         if (e.request.method === "GET") {
             if (isFile(url) || alwaysCache.includes(url.pathname)) {
