@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "esbuild src/app/sw.ts --watch --bundle --outfile=pb_public/app/sw.js --format=iife",
-    "build": "esbuild src/app/sw.ts --entry-names=[dir]/[name].[hash] --outbase=src/app --bundle --outdir=dist/public/web/js --minify --format=iife",
+    "build": "esbuild src/app/sw.ts --outbase=src/app --bundle --outdir=dist/public/web/js --minify --format=iife",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jon Nyman",

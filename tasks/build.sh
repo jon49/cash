@@ -72,7 +72,7 @@ done
 # Service worker build
 npm run build
 sw_file="dist/public/app/sw.js"
-# Find the hashed service worker file
-sw_js_file=$(find dist/public/web/js -name 'sw.*.js' | head -n 1 | sed 's|dist/public||')
-
-echo "importScripts('$sw_js_file')" > $sw_file
+sw_js_file="dist/public/web/js/sw.js"
+timestamp=$(date +%s)
+sed -i "s/v1/v${timestamp}/g" $sw_js_file
+echo "importScripts('${sw_js_file}?_=${timestamp}')" > $sw_file
