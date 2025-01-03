@@ -75,4 +75,4 @@ sw_file="dist/public/app/sw.js"
 sw_js_file="dist/public/web/js/sw.js"
 timestamp=$(date +%s)
 sed -i "s/v1/v${timestamp}/g" $sw_js_file
-echo "importScripts('${sw_js_file}?_=${timestamp}')" > $sw_file
+echo "importScripts('/web/js/sw.js?_=${timestamp}')" > $sw_file
