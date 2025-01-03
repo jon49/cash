@@ -19,7 +19,7 @@ xpath "string(//form//input[@name='subcategory']/@value)" == ""
 xpath "//form//input[@name='id']" not exists
 
 POST {{url}}/app/categories/edit/
-[FormParams]
+[Form]
 category: expense
 subcategory:   Dinings   
 HTTP 302
@@ -52,7 +52,7 @@ id: xpath "string(//form//input[@name='id']/@value)"
 
 ### Make sure you can edit the category ###
 POST {{url}}/app/categories/edit/
-[FormParams]
+[Form]
 category: expense
 subcategory: Dining
 id: {{id}}
@@ -70,7 +70,7 @@ xpath "string(//table//tr[1]/td[3]/a/@href)" == "/app/categories/edit/?id={{id}}
 ### It should be able to delete a category ###
 
 POST {{url}}/app/categories/edit/
-[FormParams]
+[Form]
 category: income
 subcategory: Delete:Me
 HTTP 302
@@ -90,7 +90,7 @@ delete_page: xpath "string(//table//tr[2]//form/@action)"
 id: xpath "string(//table//tr[2]//input[@name='id']/@value)"
 
 POST {{url}}{{delete_page}}
-[FormParams]
+[Form]
 id: {{id}}
 HTTP 302
 [Asserts]

@@ -1,6 +1,6 @@
 # Login
 POST {{url}}/login
-[FormParams]
+[Form]
 email: {{email}}
 password: {{password}}
 HTTP 302

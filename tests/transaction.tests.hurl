@@ -16,7 +16,7 @@ xpath "//form//input[@name='id']" not exists
 category_id: xpath "string(//form//select[@name='categoryId']/option[1]/@value)"
 
 POST {{url}}/app/transactions/edit/
-[FormParams]
+[Form]
 description:       Out to lunch with my wife.      
 date: 2024-12-31
 categoryId: {{category_id}}
@@ -53,7 +53,7 @@ xpath "string(//form/@method)" == "post"
 id: xpath "string(//form//input[@name='id']/@value)"
 
 POST {{url}}/app/transactions/edit/
-[FormParams]
+[Form]
 id: {{id}}
 description: Out to lunch with my delightful wife.
 date: 2024-12-31
@@ -79,7 +79,7 @@ xpath "string(//table//tfoot/tr[1])" contains "($100.00)"
 ### Delete the transaction ###
 
 POST {{url}}/app/transactions/delete/
-[FormParams]
+[Form]
 id: {{id}}
 HTTP 302
 [Asserts]
@@ -98,7 +98,7 @@ xpath "//table//tfoot" not exists
 ### Restore the transaction ###
 
 POST {{url}}/app/transactions/restore/
-[FormParams]
+[Form]
 id: {{id}}
 HTTP 302
 [Asserts]

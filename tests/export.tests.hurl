@@ -5,7 +5,7 @@ HTTP 200
 category_id: xpath "string(//form//select[@name='categoryId']/option[1]/@value)"
 
 POST {{url}}/app/transactions/edit/
-[FormParams]
+[Form]
 description: This will be soft deleted.
 date: 2024-12-30
 categoryId: {{category_id}}
@@ -23,7 +23,7 @@ id1: xpath "string(//table//tr[1]//input[@name='id']/@value)"
 id2: xpath "string(//table//tr[2]//input[@name='id']/@value)"
 
 POST {{url}}/app/transactions/delete/
-[FormParams]
+[Form]
 id: {{id2}}
 HTTP 302
 [Asserts]
@@ -62,7 +62,7 @@ xpath "string(//table//tr[1]//input[@name='id']/@value)" == "{{id1}}"
 
 # Export transactions and delete them
 POST {{url}}/app/export/
-[FormParams]
+[Form]
 deleteTransactions: on
 HTTP 200
 [Asserts]
