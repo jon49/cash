@@ -6,6 +6,11 @@ routerAdd("post", "/app/delete-all-data/", e => {
     let transactions = $app.findRecordsByFilter("transactions", `user='${userId}'`)
     let categories = $app.findRecordsByFilter("categories", `user='${userId}'`)
     let sessions = $app.findRecordsByFilter("sessions", `user='${userId}'`)
+    let settings = $app.findRecordsByFilter("settings", `user='${userId}'`)
+
+    for (let setting of settings) {
+        $app.delete(setting)
+    }
 
     for (let transaction of transactions) {
         $app.delete(transaction)

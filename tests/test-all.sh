@@ -50,6 +50,7 @@ run_with_cookies \
     ./transaction.tests.hurl \
     ./transaction-htmf.tests.hurl \
     ./export.tests.hurl \
+    ./settings.tests.hurl \
     ./logout.tests.hurl
 
 cd -
