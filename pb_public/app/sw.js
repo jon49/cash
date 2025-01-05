@@ -40,21 +40,22 @@
       caches.open(cacheVersion).then((cache) => cache.addAll(alwaysCache))
     )
   );
-  self.addEventListener(
-    "activate",
-    async (e) => {
-      let cacheNames = await caches.keys();
-      let toDeleteOldCaches = cacheNames.filter((cache) => cache !== cacheVersion).map((cache) => caches.delete(cache));
-      return e.waitUntil(Promise.all(toDeleteOldCaches));
-    }
-  );
+  self.addEventListener("activate", (e) => {
+    e.waitUntil(deleteOldCache());
+  });
+  async function deleteOldCache() {
+    let cacheNames = await caches.keys();
+    let toDeleteOldCaches = cacheNames.filter((cache) => cache !== cacheVersion).map((cache) => caches.delete(cache));
+    return Promise.all(toDeleteOldCaches);
+  }
   self.addEventListener(
     "fetch",
-    async (e) => {
-      let url = new URL(e.request.url);
-      if (e.request.method === "GET") {
+    (e) => {
+      let request = e.request;
+      let url = new URL(request.url);
+      if (request.method === "GET") {
         if (isFile(url) || alwaysCache.includes(url.pathname)) {
-          let isHFRequest = e.request.headers.get("HF-Request") === "true";
+          let isHFRequest = request.headers.get("HF-Request") === "true";
           let hfUrl = "";
           if (isHFRequest) {
             hfUrl = `/hf${url.pathname}${url.search}`;
@@ -63,7 +64,7 @@
           return e.respondWith(
             caches.match(isHFRequest ? hfUrl : pathname).then((response) => {
               if (!response) {
-                return fetch(e.request).then(async (networkResponse) => {
+                return fetch(request).then(async (networkResponse) => {
                   if (networkResponse && networkResponse.status === 200) {
                     await caches.open(cacheVersion).then((cache) => {
                       return cache.put(isHFRequest ? hfUrl : pathname, networkResponse.clone());
@@ -78,14 +79,14 @@
         }
         return e.respondWith(
           // @ts-ignore
-          fetch(e.request).then((response) => {
+          fetch(request).then((response) => {
             let responseClone = response.clone();
             caches.open(cacheVersion).then((cache) => {
-              cache.put(e.request, responseClone);
+              cache.put(request, responseClone);
             });
             return response;
           }).catch(async () => {
-            let match = caches.match(e.request);
+            let match = caches.match(request);
             if (match) {
               return match;
             } else {
@@ -94,9 +95,12 @@
           })
         );
       }
-      if (e.request.method === "POST") {
-        let clonedRequest = e.request.clone();
-        e.respondWith(fetch(e.request).catch(async () => {
+      if (request.method === "POST") {
+        if (url.pathname.startsWith("/sw/sync")) {
+          return e.respondWith(syncPostRequests(request));
+        }
+        let clonedRequest = request.clone();
+        e.respondWith(fetch(request).catch(async () => {
           await savePostRequest(clonedRequest);
           return new Response("No internet is available currently.", {
             status: 200,
@@ -131,12 +135,7 @@
     });
     await set("postRequests", posts);
   }
-  self.addEventListener("sync", (event) => {
-    if (event.tag === "syncPostRequests") {
-      return event.waitUntil(syncPostRequests());
-    }
-  });
-  async function syncPostRequests() {
+  async function syncPostRequests(req) {
     let posts = await get("postRequests") ?? [];
     let requests = [...posts];
     for (let savedRequest of posts) {
@@ -152,8 +151,15 @@
         await set("postRequests", requests);
       } catch (error) {
         console.error("Failed to sync request", error);
+        return new Response("<p>Failed to sync request.</p>", { status: 200, headers: { "Content-Type": "text/html" } });
       }
     }
+    console.log("referrer", req.referrer);
+    console.log("url", req.url);
+    return new Response(JSON.stringify({ redirectUrl: req.referrer }), {
+      headers: { "Content-Type": "application/json" },
+      status: 200
+    });
   }
   function isFile(url) {
     return url.pathname.includes(".");

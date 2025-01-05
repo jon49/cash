@@ -23,7 +23,11 @@
                     </a>
                 </li>
                 {{if not .loggedOut}}
-                <li id="sync" hidden><button>Sync Data</button></li>
+                <li id="sync" hidden>
+                    <form action="/sw/sync/" method="post">
+                        <button>Sync Data</button>
+                    </form>
+                </li>
                 {{end}}
             </ul>
             {{if not .loggedOut}}

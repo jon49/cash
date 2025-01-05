@@ -24,12 +24,13 @@ async function deleteOldCache() {
 }
 
 self.addEventListener("fetch",
-    async (e: FetchEvent) => {
-        let url = new URL(e.request.url)
+    (e: FetchEvent) => {
+        let request = e.request
+        let url = new URL(request.url)
 
-        if (e.request.method === "GET") {
+        if (request.method === "GET") {
             if (isFile(url) || alwaysCache.includes(url.pathname)) {
-                let isHFRequest = e.request.headers.get("HF-Request") === "true"
+                let isHFRequest = request.headers.get("HF-Request") === "true"
                 let hfUrl = ""
                 if (isHFRequest) {
                     hfUrl = `/hf${url.pathname}${url.search}`
@@ -39,7 +40,7 @@ self.addEventListener("fetch",
                 return e.respondWith(
                     caches.match(isHFRequest ? hfUrl : pathname).then((response) => {
                         if (!response) {
-                            return fetch(e.request).then(async (networkResponse) => {
+                            return fetch(request).then(async (networkResponse) => {
                                 if (networkResponse && networkResponse.status === 200) {
                                     await caches.open(cacheVersion).then((cache) => {
                                         return cache.put(isHFRequest ? hfUrl : pathname, networkResponse.clone())
@@ -56,16 +57,16 @@ self.addEventListener("fetch",
             // Prefer network for other requests but cache the response for future offline requests
             return e.respondWith(
                 // @ts-ignore
-                fetch(e.request)
+                fetch(request)
                     .then((response) => {
                         let responseClone = response.clone()
                         caches.open(cacheVersion).then((cache) => {
-                            cache.put(e.request, responseClone)
+                            cache.put(request, responseClone)
                         })
                         return response
                     })
                     .catch(async () => {
-                        let match = caches.match(e.request)
+                        let match = caches.match(request)
                         if (match) {
                             return match
                         } else {
@@ -75,10 +76,14 @@ self.addEventListener("fetch",
             )
         }
 
-        if (e.request.method === "POST") {
+        if (request.method === "POST") {
+            if (url.pathname.startsWith("/sw/sync")) {
+                return e.respondWith(syncPostRequests(request))
+            }
+
             // Save the request for later
-            let clonedRequest = e.request.clone()
-            e.respondWith(fetch(e.request).catch(async () => {
+            let clonedRequest = request.clone()
+            e.respondWith(fetch(request).catch(async () => {
                 await savePostRequest(clonedRequest)
                 return new Response("No internet is available currently.", {
                     status: 200,
@@ -115,15 +120,7 @@ async function savePostRequest(request: Request) {
     await set("postRequests", posts)
 }
 
-self.addEventListener("sync", (event: Event /* SyncEvent */) => {
-    // @ts-ignore
-    if (event.tag === "syncPostRequests") {
-        // @ts-ignore
-        return event.waitUntil(syncPostRequests())
-    }
-})
-
-async function syncPostRequests() {
+async function syncPostRequests(req: Request) {
     let posts = await get("postRequests") ?? []
 
     let requests = [...posts]
@@ -141,8 +138,16 @@ async function syncPostRequests() {
             await set("postRequests", requests)
         } catch (error) {
             console.error("Failed to sync request", error)
+            return new Response("<p>Failed to sync request.</p>", { status: 200, headers: { "Content-Type": "text/html" } })
         }
     }
+
+    console.log("referrer", req.referrer)
+    console.log("url", req.url)
+    return new Response(JSON.stringify({ redirectUrl: req.referrer }), {
+        headers: { "Content-Type": "application/json" },
+        status: 200,
+    })
 }
 
 function isFile(url: URL) {

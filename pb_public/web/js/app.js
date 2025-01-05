@@ -179,19 +179,11 @@ if (navigator?.serviceWorker?.controller) {
     const messageChannel = new MessageChannel()
     messageChannel.port1.onmessage = (event) => {
         let syncEl = document.getElementById("sync")
-        if (event.data.hasPendingSync) {
-            let syncButton = syncEl?.querySelector("button")
-            if (!syncButton) return
+        if (!syncEl) return
+        if (syncEl && event.data.hasPendingSync) {
             syncEl.hidden = false
-            syncButton.addEventListener("click", () => {
-                navigator.serviceWorker.ready.then((registration) => {
-                    registration.sync.register("syncPostRequests")
-                })
-            })
         } else {
-            if (syncEl) {
-                syncEl.hidden = true
-            }
+            syncEl.hidden = true
         }
     }
     navigator.serviceWorker.controller.postMessage({ type: "CHECK_SYNC_STATUS" }, [messageChannel.port2])
