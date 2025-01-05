@@ -12,15 +12,16 @@ self.addEventListener("install", (e: ExtendableEvent) =>
     )
 )
 
-self.addEventListener("activate",
-    async (e: ExtendableEvent) => {
-        let cacheNames = await caches.keys()
-        let toDeleteOldCaches =
-            cacheNames
-                .filter(cache => cache !== cacheVersion)
-                .map(cache => caches.delete(cache))
-        return e.waitUntil(Promise.all(toDeleteOldCaches))
-    })
+self.addEventListener("activate", (e: ExtendableEvent) => { e.waitUntil(deleteOldCache()) })
+
+async function deleteOldCache() {
+    let cacheNames = await caches.keys()
+    let toDeleteOldCaches =
+        cacheNames
+            .filter(cache => cache !== cacheVersion)
+            .map(cache => caches.delete(cache))
+    return Promise.all(toDeleteOldCaches)
+}
 
 self.addEventListener("fetch",
     async (e: FetchEvent) => {
