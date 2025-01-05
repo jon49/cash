@@ -180,7 +180,7 @@ if (navigator?.serviceWorker?.controller) {
     messageChannel.port1.onmessage = (event) => {
         let syncEl = document.getElementById("sync")
         if (!syncEl) return
-        syncEl.hidden = event.data.hasPendingSync
+        syncEl.hidden = !event.data.hasPendingSync
     }
     navigator.serviceWorker.controller.postMessage({ type: "CHECK_SYNC_STATUS" }, [messageChannel.port2])
 }
