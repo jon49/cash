@@ -59,6 +59,17 @@ self.addEventListener("fetch",
                 // @ts-ignore
                 fetch(request)
                     .then((response) => {
+                        if (response.status === 503) {
+                            let match = caches.match(request)
+                            if (match) {
+                                return match
+                            } else {
+                                return new Response("Service unavailable.", { status: 200 })
+                            }
+                        }
+                        if (!response || response.status !== 200 || response.type !== "basic") {
+                            return response
+                        }
                         let responseClone = response.clone()
                         caches.open(cacheVersion).then((cache) => {
                             cache.put(request, responseClone)
