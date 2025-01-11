@@ -29,12 +29,13 @@
             <input type=number step="0.01" name=amount required value="{{.amount}}" {{if not .edit}}autofocus{{end}}>
         </label>
     </fieldset>
-
 </form>
 
 <div class="grid reverse">
-    <button form="transaction-edit-form" type=submit style="margin:0">Save</button>
-    <!-- <button>Add Detail</button> -->
+    <button form="transaction-edit-form" class="m-0" type=submit>Save</button>
+    <button form="transaction-edit-form" formaction="/app/transactions/edit/?addAnother" class="m-0" type=submit
+        hf-select="#transaction-edit-form">
+        Save &amp; New</button>
     <form action="/app/categories/edit/" hf-target="#dialog">
         <button class="w-100">Add Category</button>
     </form>

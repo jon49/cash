@@ -1,4 +1,4 @@
-import { get, set, update } from "idb-keyval"
+import { get, set } from "idb-keyval"
 
 let cacheVersion = "v1"
 
@@ -8,7 +8,7 @@ let alwaysCache = [
 
 self.addEventListener("install", (e: ExtendableEvent) =>
     e.waitUntil(
-        caches.open(cacheVersion).then(cache => cache.addAll(alwaysCache))
+        caches.open(cacheVersion).then(cache => cache.addAll([...alwaysCache, "/app/transactions/edit/"]))
     )
 )
 
