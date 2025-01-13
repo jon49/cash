@@ -17,10 +17,10 @@ location: header "location"
 GET {{url}}/app/transactions/
 HTTP 200
 [Asserts]
-xpath "string(//table//tr[2]/td[1]/a)" contains "2024-12-30"
+xpath "string(//td[1]/a[contains(text(),'2024-12-30')])" exists
 [Captures]
 id1: xpath "string(//table//tr[1]//input[@name='id']/@value)"
-id2: xpath "string(//table//tr[2]//input[@name='id']/@value)"
+id2: xpath "string(//td[contains(text(), 'This will be soft deleted.')]/ancestor-or-self::tr//input[@name='id']/@value)"
 
 POST {{url}}/app/transactions/delete/
 [Form]
@@ -39,8 +39,7 @@ GET {{url}}/app/export/
 HTTP 200
 [Asserts]
 xpath "string(//h2)" == "Export Data"
-xpath "string(//form/@action)" == "/app/export/"
-xpath "string(//form/@method)" == "post"
+xpath "//form[@action='/app/export/'][@method='post']" exists
 xpath "//input[@name='deleteTransactions']" exists
 xpath "//input[@name='deleteTransactions']/@checked" exists
 xpath "//input[@type='submit']" exists

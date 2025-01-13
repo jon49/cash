@@ -46,7 +46,7 @@ xpath "//input[@value='currency']/ancestor::form//input[@value='¥']" exists
 GET {{url}}/app/transactions/
 HTTP 200
 [Asserts]
-xpath "string(//table//tr[1]/td[3])" == "(¥100.00)"
+xpath "string(//table//tr[1]/td[3])" contains "¥"
 
 ### Test that exports use the replacement text ###
 

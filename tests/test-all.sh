@@ -33,7 +33,7 @@ run_with_cookies() {
     # If debug mode then add argument "--error-format long"
     if [ "$DEBUG_MODE" = true ]; then
         hurl --test --jobs 1 --variables-file "$env.env" --cookie ./cookie-jar.tsv \
-            --error-format long "${@:1}"
+            --error-format long "${@:1}" --verbose
     else
         hurl --test --jobs 1 --variables-file "$env.env" --cookie ./cookie-jar.tsv "${@:1}"
     fi

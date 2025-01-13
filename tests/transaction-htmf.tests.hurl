@@ -5,6 +5,8 @@ HTTP 200
 xpath "//select[@name='categoryId']//option[contains(text(),'Income - SideHustle')]" not exists
 [Captures]
 category_form_url: xpath "string(//form[@hf-target='#dialog']/@action)"
+add_another_url: xpath "string(//button[contains(text(),'Save & New')]/@formaction)"
+category_id: xpath "string(//form//select[@name='categoryId']/option[1]/@value)"
 
 GET {{url}}{{category_form_url}}
 HF-Request: true
@@ -26,3 +28,16 @@ subcategory: SideHustle
 HTTP 200
 [Asserts]
 xpath "//select[@name='categoryId']//option[contains(text(),'Income - SideHustle')]" exists
+
+# Create a new transaction and immediately create another
+
+POST {{url}}{{add_another_url}}
+HF-Request: true
+[Form]
+description: Testing 2
+date: 2025-01-12
+categoryId: {{category_id}}
+amount: 112
+HTTP 200
+[Asserts]
+xpath "//form[@id='transaction-edit-form']" exists

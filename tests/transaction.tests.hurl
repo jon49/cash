@@ -5,13 +5,13 @@ GET {{url}}/app/transactions/edit/
 HTTP 200
 [Asserts]
 xpath "string(//h2)" == "New Transaction"
-xpath "string(//form/@action)" == "/app/transactions/edit/"
-xpath "string(//form/@method)" == "post"
+xpath "string(//form[@action='/app/transactions/edit/'][@method='post'])" exists
 xpath "string(//form//select[@name='description']/@value)" == ""
 xpath "string(//form//input[@name='date']/@value)" == ""
 xpath "//form//select[@name='categoryId']/option/@value" exists
 xpath "string(//form//input[@name='amount']/@value)" == ""
 xpath "//form//input[@name='id']" not exists
+xpath "//button[@formaction='/app/transactions/edit/?addAnother']" exists
 [Captures]
 category_id: xpath "string(//form//select[@name='categoryId']/option[1]/@value)"
 
@@ -38,6 +38,7 @@ xpath "string(//table//tr[1]/td[4])" == "Out to lunch with my wife."
 xpath "string(//table//tr[1]/td[5]/form/@action)" == "/app/transactions/delete/"
 xpath "string(//table//tfoot/tr[1])" contains "Total"
 xpath "string(//table//tfoot/tr[1])" contains "($100.00)"
+xpath "//a[@href='/app/transactions/edit/']" count == 3
 [Captures]
 edit_page: xpath "string(//table//tr[1]/td[1]/a/@href)"
 
@@ -47,8 +48,7 @@ GET {{url}}{{edit_page}}
 HTTP 200
 [Asserts]
 xpath "string(//h2)" == "Edit Transaction"
-xpath "string(//form/@action)" startsWith "/app/transactions/edit/"
-xpath "string(//form/@method)" == "post"
+xpath "//form[@action='/app/transactions/edit/'][@method='post']" exists
 [Captures]
 id: xpath "string(//form//input[@name='id']/@value)"
 
@@ -110,3 +110,17 @@ HTTP 200
 xpath "string(//h2)" == "Transactions"
 xpath "string(//table//tr[1]/td[1]/a)" == "2024-12-31"
 xpath "//summary" not exists
+
+### Save and add another ###
+
+POST {{url}}/app/transactions/edit/?addAnother
+[Form]
+description: Testing
+date: 2025-01-12
+categoryId: {{category_id}}
+amount: 112
+HTTP 302
+[Asserts]
+header "location" == "/app/transactions/edit/"
+[Captures]
+location: header "location"

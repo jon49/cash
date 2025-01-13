@@ -12,8 +12,7 @@ GET {{url}}/app/categories/edit/
 HTTP 200
 [Asserts]
 xpath "string(//h2)" == "New Category"
-xpath "string(//form/@action)" == "/app/categories/edit/"
-xpath "string(//form/@method)" == "post"
+xpath "string(//form[@action='/app/categories/edit/']/@method)" == "post"
 xpath "string(//form//select[@name='category']/@value)" == ""
 xpath "string(//form//input[@name='subcategory']/@value)" == ""
 xpath "//form//input[@name='id']" not exists
@@ -42,8 +41,7 @@ GET {{url}}{{edit_page}}
 HTTP 200
 [Asserts]
 xpath "string(//h2)" == "Edit Category"
-xpath "string(//form/@action)" startsWith "/app/categories/edit/"
-xpath "string(//form/@method)" == "post"
+xpath "string(//form[@action='/app/categories/edit/']/@method)" == "post"
 xpath "string(//form//select/option[@selected]/@value)" == "expense"
 xpath "string(//form//input[@name='subcategory']/@value)" == "Dinings"
 xpath "//form//input[@name='id']" exists
