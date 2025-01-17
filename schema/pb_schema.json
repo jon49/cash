@@ -870,7 +870,9 @@
         "type": "autodate"
       }
     ],
-    "indexes": [],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_oeppd4bT0e` ON `categories` (`category_type`, `name`)"
+    ],
     "system": false
   },
   {
