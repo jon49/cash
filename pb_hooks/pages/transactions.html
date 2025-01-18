@@ -8,51 +8,7 @@
 {{define "main"}}
 
 {{if .hasTransactions}}
-<table>
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Category</th>
-            <th>Amount</th>
-            <th>Description</th>
-            <th></th>
-        </tr>
-    </thead>
-
-    <tbody>
-        {{range .transactions}}
-        <tr>
-            <td><a href="/app/transactions/edit/?id={{.id}}">{{.date}}</a></td>
-            <td>{{.category}}</td>
-            <td>{{.amountView}}</td>
-            <td>{{.description}}</td>
-            <td>
-                <form method="post" action="/app/transactions/delete/">
-                    <input type="hidden" name="id" value="{{.id}}">
-                    <input class="outline secondary m-0 p-0 px-3 fs-1" type="submit" aria-label="Delete"
-                        value="&times;">
-                </form>
-            </td>
-        </tr>
-        {{end}}
-    </tbody>
-    <tfoot>
-        <tr>
-            <td colspan=2>Total</td>
-            <td colspan="3">{{.total}}</td>
-        </tr>
-    </tfoot>
-</table>
-{{else}}
-<p>No active transactions found!</p>
-{{end}}
-
-{{if .hasDeleted}}
-<details>
-    <summary>
-        <h3 class="inline">View Deleted Transactions</h3>
-    </summary>
-    <p>These will be deleted permanently.</p>
+<div class="overflow-auto">
     <table>
         <thead>
             <tr>
@@ -65,22 +21,70 @@
         </thead>
 
         <tbody>
-            {{range .deletedTransactions}}
+            {{range .transactions}}
             <tr>
                 <td><a href="/app/transactions/edit/?id={{.id}}">{{.date}}</a></td>
                 <td>{{.category}}</td>
                 <td>{{.amountView}}</td>
                 <td>{{.description}}</td>
                 <td>
-                    <form method="post" action="/app/transactions/restore/">
+                    <form method="post" action="/app/transactions/delete/">
                         <input type="hidden" name="id" value="{{.id}}">
-                        <input class="m-0" type="submit" value="Restore">
+                        <input class="outline secondary m-0 p-0 px-3 fs-1" type="submit" aria-label="Delete"
+                            value="&times;">
                     </form>
                 </td>
             </tr>
             {{end}}
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan=2>Total</td>
+                <td colspan="3">{{.total}}</td>
+            </tr>
+        </tfoot>
     </table>
+</div>
+{{else}}
+<p>No active transactions found!</p>
+{{end}}
+
+{{if .hasDeleted}}
+<details>
+    <summary>
+        <h3 class="inline">View Deleted Transactions</h3>
+    </summary>
+    <p>These will be deleted permanently.</p>
+    <div class="overflow-auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {{range .deletedTransactions}}
+                <tr>
+                    <td><a href="/app/transactions/edit/?id={{.id}}">{{.date}}</a></td>
+                    <td>{{.category}}</td>
+                    <td>{{.amountView}}</td>
+                    <td>{{.description}}</td>
+                    <td>
+                        <form method="post" action="/app/transactions/restore/">
+                            <input type="hidden" name="id" value="{{.id}}">
+                            <input class="m-0" type="submit" value="Restore">
+                        </form>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
 </details>
 {{end}}
 {{end}}

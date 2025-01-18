@@ -8,31 +8,33 @@
 {{define "main"}}
 
 {{if .hasCategories}}
-<table>
-    <thead>
-        <tr>
-            <th>Category</th>
-            <th>Subcategory</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {{range .categories}}
-        <tr>
-            <td>{{.category}}</td>
-            <td>{{.subcategory}}</td>
-            <td> <a href="/app/categories/edit/?id={{.id}}">Edit</a></td>
-            <td>
-                <form method="post" action="/app/categories/delete/">
-                    <input type="hidden" name="id" value="{{.id}}">
-                    <input class="outline secondary m-0 p-0 px-3 fs-1 w-auto" type="submit" aria-label="Delete"
-                        value="&times;">
-                </form>
-            </td>
-        </tr>
-        {{end}}
-    </tbody>
-</table>
+<div class="autoflow-auto">
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Subcategory</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .categories}}
+            <tr>
+                <td>{{.category}}</td>
+                <td>{{.subcategory}}</td>
+                <td> <a href="/app/categories/edit/?id={{.id}}">Edit</a></td>
+                <td>
+                    <form method="post" action="/app/categories/delete/">
+                        <input type="hidden" name="id" value="{{.id}}">
+                        <input class="outline secondary m-0 p-0 px-3 fs-1 w-auto" type="submit" aria-label="Delete"
+                            value="&times;">
+                    </form>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
 {{else}}
 <p>No active categories found!</p>
 {{end}}
@@ -44,30 +46,32 @@
     </summary>
     <p>These will be deleted permanently.</p>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Category</th>
-                <th>Subcategory</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {{range .deletedCategories}}
-            <tr>
-                <td>{{.category}}</td>
-                <td>{{.subcategory}}</td>
-                <td><a href="/app/categories/edit/?id={{.id}}">Edit</a></td>
-                <td>
-                    <form method="post" action="/app/categories/restore/">
-                        <input type="hidden" name="id" value="{{.id}}">
-                        <input class="m-0 w-auto" type="submit" value="Restore">
-                    </form>
-                </td>
-            </tr>
-            {{end}}
-        </tbody>
-    </table>
+    <div class="overflow-auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Subcategory</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .deletedCategories}}
+                <tr>
+                    <td>{{.category}}</td>
+                    <td>{{.subcategory}}</td>
+                    <td><a href="/app/categories/edit/?id={{.id}}">Edit</a></td>
+                    <td>
+                        <form method="post" action="/app/categories/restore/">
+                            <input type="hidden" name="id" value="{{.id}}">
+                            <input class="m-0 w-auto" type="submit" value="Restore">
+                        </form>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
 
 </details>
 {{end}}
