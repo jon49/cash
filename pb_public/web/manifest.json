@@ -1,7 +1,7 @@
 {
     "name": "Cash Tracker",
     "background_color": "#333",
-    "theme_color": "#f0f0f0",
+    "theme_color": "#e48500",
     "icons": [
         {
             "src": "/web/images/cash.ico",
