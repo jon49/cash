@@ -37,7 +37,7 @@
   self.addEventListener(
     "install",
     (e) => e.waitUntil(
-      caches.open(cacheVersion).then((cache) => cache.addAll(alwaysCache))
+      caches.open(cacheVersion).then((cache) => cache.addAll([...alwaysCache, "/app/transactions/edit/"]))
     )
   );
   self.addEventListener("activate", (e) => {
