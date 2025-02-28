@@ -21,20 +21,6 @@ generate_md5_hash() {
 manifest_file="dist/public/web/manifest.json"
 destStaticDir="dist/public"
 
-# In the app.css file find linked static image src files and add MD5 hash
-app_css="dist/public/web/css/app.css"
-while IFS= read -r line; do
-    # Check if the line contains a URL pattern
-    if [[ $line =~ url\(\"([^\"]+)\"\) ]]; then
-        file="${BASH_REMATCH[1]}"
-        if [[ $file != http* ]]; then
-            hash=$(generate_md5_hash "$destStaticDir/$file")
-            new_file="${file}?_=${hash}"
-            sed -i "s|$file|$new_file|g" $app_css
-        fi
-    fi
-done < $app_css
-
 # In the dist/public/web/manifest.json file, find linked static image src files and add MD5 hash
 while IFS= read -r line; do
     if [[ $line =~ \"src\":\ \"([^\"]+)\" ]]; then
@@ -62,6 +48,14 @@ for dist_html_file in dist/pb_hooks/pages/*.html; do
             file="${BASH_REMATCH[1]}"
             if [[ $file != http* ]]; then
                 hash=$(generate_md5_hash "pb_public/$file")
+                new_file="${file}?_=${hash}"
+                sed -i "s|$file|$new_file|g" $dist_html_file
+            fi
+        elif
+            [[ $line =~ url\(\"([^\"]+)\" ]]; then
+            file="${BASH_REMATCH[1]}"
+            if [[ $file != http* ]]; then
+                hash=$(generate_md5_hash "$destStaticDir/$file")
                 new_file="${file}?_=${hash}"
                 sed -i "s|$file|$new_file|g" $dist_html_file
             fi
