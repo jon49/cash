@@ -164,6 +164,12 @@ class xDelete extends HTMLElement {
 
 window.customElements.define('x-delete', xDelete)
 
+document.addEventListener("message", e => {
+    let el = document.getElementById("msg")
+    if (!el) return
+    el.innerHTML = `<p class="msg">${e.detail}</p>`
+})
+
 if (location.pathname === "/app/transactions/edit/" && location.search === "" && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/app/sw.js', { updateViaCache: 'imports' }).then(registration => {

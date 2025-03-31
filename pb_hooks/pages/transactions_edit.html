@@ -5,7 +5,9 @@
 {{end}}
 
 {{define "main"}}
+<div id="msg">
 {{if .msg}}<p class="msg">{{.msg}}</p>{{end}}
+</div>
 
 <form id="transaction-edit-form" method="post" action="/app/transactions/edit/">
     {{if .id}}<input type=hidden name=id value="{{.id}}">{{end}}

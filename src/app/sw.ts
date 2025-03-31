@@ -81,7 +81,12 @@ self.addEventListener("fetch",
                         if (match) {
                             return match
                         } else {
-                            return new Response("No internet is available currently.", { status: 200 })
+                            return new Response(null, {
+                                status: 204,
+                                headers: {
+                                    "hf-events": `{"message":"You are currently offline. Any changes will be saved and synced when you are back online."}`,
+                                }
+                            })
                         }
                     })
             )
@@ -96,9 +101,11 @@ self.addEventListener("fetch",
             let clonedRequest = request.clone()
             e.respondWith(fetch(request).catch(async () => {
                 await savePostRequest(clonedRequest)
-                return new Response("No internet is available currently.", {
-                    status: 200,
-                    headers: { "Content-Type": "text/html" },
+                return new Response(null, {
+                    status: 204,
+                    headers: {
+                        "hf-events": `{"message":"You are currently offline. Any changes will be saved and synced when you are back online."}`,
+                    }
                 })
             }))
         }
