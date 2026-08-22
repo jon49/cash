@@ -170,23 +170,46 @@ document.addEventListener("message", e => {
     el.innerHTML = `<p class="msg">${e.detail}</p>`
 })
 
-if (location.pathname === "/app/transactions/edit/" && location.search === "" && 'serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/app/sw.js', { updateViaCache: 'imports' }).then(registration => {
+// The worker is served from the root so that its scope covers every page --
+// "/" and "/login" included -- and not just "/app/".
+if (location.pathname.startsWith("/app/") && 'serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+        try {
+            let registration =
+                await navigator.serviceWorker.register('/sw.js', { updateViaCache: 'imports' })
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        }).catch(error => {
+
+            // Retire the old "/app/" scoped worker. Its scope is the more
+            // specific one, so it would keep control of these pages.
+            for (let old of await navigator.serviceWorker.getRegistrations()) {
+                if (old.scope !== registration.scope) {
+                    await old.unregister()
+                }
+            }
+        } catch (error) {
             console.log('ServiceWorker registration failed: ', error);
-        });
+        }
     });
+}
+
+/** @param {boolean} hasPendingSync */
+function showSync(hasPendingSync) {
+    let syncEl = document.getElementById("sync")
+    if (!syncEl) return
+    syncEl.hidden = !hasPendingSync
 }
 
 // Check if there are any posts that need syncing.
 if (navigator?.serviceWorker?.controller) {
     const messageChannel = new MessageChannel()
-    messageChannel.port1.onmessage = (event) => {
-        let syncEl = document.getElementById("sync")
-        if (!syncEl) return
-        syncEl.hidden = !event.data.hasPendingSync
-    }
+    messageChannel.port1.onmessage = (event) => showSync(event.data.hasPendingSync)
     navigator.serviceWorker.controller.postMessage({ type: "CHECK_SYNC_STATUS" }, [messageChannel.port2])
 }
+
+// And let the worker tell us when it queues something up while we're offline,
+// so the sync button shows up without needing a reload.
+navigator.serviceWorker?.addEventListener("message", event => {
+    if (event.data?.type === "SYNC_STATUS") {
+        showSync(event.data.hasPendingSync)
+    }
+})

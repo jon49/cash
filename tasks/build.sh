@@ -65,8 +65,9 @@ done
 
 # Service worker build
 npm run build
-sw_file="dist/public/app/sw.js"
+# The worker is served from the root so its scope covers the whole site.
+sw_file="dist/public/sw.js"
 sw_js_file="dist/public/web/js/sw.js"
 timestamp=$(date +%s)
-sed -i "s/v1/v${timestamp}/g" $sw_js_file
+sed -i "s/__CACHE_VERSION__/v${timestamp}/g" $sw_js_file
 echo "importScripts('/web/js/sw.js?_=${timestamp}')" > $sw_file

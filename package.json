@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "esbuild src/app/sw.ts --watch --bundle --outfile=pb_public/app/sw.js --format=iife",
+    "start": "esbuild src/app/sw.ts --watch --bundle --outfile=pb_public/sw.js --format=iife",
     "build": "esbuild src/app/sw.ts --outbase=src/app --bundle --outdir=dist/public/web/js --minify --format=iife",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
