@@ -41,6 +41,10 @@ body {
     width: 100%;
 }
 
+.w-4 {
+    width: 4rem;
+}
+
 .text-end {
     text-align: end;
 }
