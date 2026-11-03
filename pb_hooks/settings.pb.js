@@ -45,8 +45,12 @@ routerAdd("post", "/app/settings/", e => {
 
     $app.save(record)
 
-    if (e.request.header.get("HF-Request") === "true") {
-        return e.html(200, `<x-delete><p class=msg>Saved!</p></x-delete>`)
+    let { isHz } = require(`${__hooks}/utils.js`)
+    if (isHz(e)) {
+        let html = $template.loadString(
+            `<div id="{{.id}}Msg"><x-delete><p class=msg>Saved!</p></x-delete></div>`
+        ).render({ id })
+        return e.html(200, html)
     }
     return e.redirect(302, `/app/settings/?${id}Msg=Saved!`)
 })

@@ -22,8 +22,9 @@ module.exports = {
      * @param {string} __hooks
      * @param {*} utils
      * @param {Function} getCategorySelectData
+     * @param {boolean} [fragment] Render only the form, for htmz to swap in.
      */
-    getEditTransactionPage(e, $app, $template, __hooks, utils, getCategorySelectData) {
+    getEditTransactionPage(e, $app, $template, __hooks, utils, getCategorySelectData, fragment) {
         let id = e.request.url.query().get("id")
         let data = {
             header: "New Transaction",
@@ -63,9 +64,12 @@ module.exports = {
             })
         }
 
+        let templates = fragment
+            ? [`${__hooks}/pages/transactions_edit_form.html`]
+            : [`${__hooks}/pages/layout.html`, `${__hooks}/pages/transactions_edit.html`]
         const html = $template.loadFiles(
-            `${__hooks}/pages/layout.html`,
-            `${__hooks}/pages/transactions_edit.html`,
+            ...templates,
+            `${__hooks}/pages/transactions_edit_form_template.html`,
             `${__hooks}/pages/transactions_edit_select_categories_template.html`,
         ).render(data)
 

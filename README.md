@@ -116,6 +116,15 @@ Note the caveat given in the FAQ in the Hurl documentation for Hurl about Mac
 computers and libcurl caveats. I don't have a Mac so I don't know if it really
 matters for the current test set up.
 
+The browser tests use [Playwright](https://playwright.dev/). They read the same
+`tests/local.env` file and start the server themselves if it isn't running:
+
+```
+npm i
+npx playwright install chromium
+npm run test:e2e
+```
+
 ## Running in Production
 
 TODO: Add docs for this.

@@ -16,15 +16,20 @@ let alwaysCache = [
     "/app/categories/edit/",
 ]
 
+// The partial htmz asks for, e.g. the "Add Category" dialog. The `_hz` field it
+// adds keeps it under a different cache key from the full page.
+let partials = alwaysCache.map(path => `${path}?_hz=1`)
+
 // Everything needed to render the app with the server unreachable.
 let precache = [
     ...alwaysCache,
+    ...partials,
     homePage,
     offlinePage,
     "/web/css/app.css",
     "/web/css/pico.min.css",
     "/web/js/app.js",
-    "/web/js/html-form.min.js",
+    "/web/js/htmz.js",
     "/web/manifest.json",
     "/web/images/cash.svg",
     "/web/images/cash.ico",
@@ -51,22 +56,15 @@ async function fillCache() {
     let cache = await caches.open(cacheVersion)
     // One at a time rather than cache.addAll so a single missing file can't stop
     // the whole worker from installing.
-    let addToCache = async (path: string, hf: boolean) => {
+    let addToCache = async (path: string) => {
         try {
-            let response = await fetch(path, {
-                credentials: "same-origin",
-                headers: hf ? { "HF-Request": "true" } : void 0,
-            })
+            let response = await fetch(path, { credentials: "same-origin" })
             if (isCacheable(response)) {
-                await cache.put(hf ? `/hf${path}` : path, response)
+                await cache.put(path, response)
             }
         } catch (_) { }
     }
-    await Promise.all([
-        ...precache.map(path => addToCache(path, false)),
-        // The partials html-form pulls in, e.g. the "Add Category" dialog.
-        ...alwaysCache.map(path => addToCache(path, true)),
-    ])
+    await Promise.all(precache.map(addToCache))
 }
 
 async function deleteOldCache() {
@@ -98,7 +96,7 @@ self.addEventListener("fetch",
     })
 
 async function handleGet(e: FetchEvent, request: Request, url: URL) {
-    let key = cacheKey(request, url)
+    let key = cacheKey(url)
 
     if (isFile(url) || alwaysCache.includes(url.pathname)) {
         return cacheFirst(e, request, key)
@@ -173,8 +171,18 @@ function isCacheable(response: Response | undefined) {
         && !response.redirected
 }
 
+// htmz sends its requests through a hidden iframe. Those want a fragment to swap
+// into the page, never a whole page.
+function isHz(request: Request) {
+    return request.destination === "iframe"
+}
+
 // The last resort: whatever we can still show without a server.
 async function offlineFallback(request: Request, url: URL) {
+    if (isHz(request)) {
+        return messageResponse(request, unreachableMessage)
+    }
+
     if (request.mode === "navigate") {
         // "/" is only ever a redirect to the new transaction page, so go
         // straight there instead of showing an error.
@@ -186,19 +194,25 @@ async function offlineFallback(request: Request, url: URL) {
         let page = await caches.match(offlinePage)
         if (page) return page
 
-        return new Response(fallbackHtml, {
-            status: 200,
-            headers: { "Content-Type": "text/html; charset=utf-8" },
-        })
+        return htmlResponse(fallbackHtml)
     }
 
-    return messageResponse(unreachableMessage)
+    return messageResponse(request, unreachableMessage)
 }
 
-function messageResponse(message: string) {
-    return new Response(null, {
-        status: 204,
-        headers: { "hf-events": JSON.stringify({ message }) },
+// htmz swaps the message into the page's #msg. A plain form submission gets a
+// 204, which leaves the page as it is.
+function messageResponse(request: Request, message: string) {
+    if (isHz(request)) {
+        return htmlResponse(`<div id="msg"><p class="msg">${message}</p></div>`)
+    }
+    return new Response(null, { status: 204 })
+}
+
+function htmlResponse(html: string) {
+    return new Response(html, {
+        status: 200,
+        headers: { "Content-Type": "text/html; charset=utf-8" },
     })
 }
 
@@ -215,13 +229,13 @@ async function handlePost(request: Request, url: URL) {
     } catch (_) { }
 
     if (neverQueue.includes(url.pathname)) {
-        return messageResponse("Can't reach the server right now. Please try again once you are back online.")
+        return messageResponse(request, "Can't reach the server right now. Please try again once you are back online.")
     }
 
     // Save the request for later.
     await savePostRequest(clonedRequest)
     await notifyPendingSync()
-    return messageResponse(offlineMessage)
+    return messageResponse(request, offlineMessage)
 }
 
 self.addEventListener("message", async (event) => {
@@ -280,42 +294,49 @@ async function syncPostRequests(req: Request) {
         } catch (error) {
             console.error("Failed to sync request", error)
             await notifyPendingSync()
-            return new Response("<p>Failed to sync. Please try again once you are back online.</p>", { status: 200, headers: { "Content-Type": "text/html" } })
+            let message = "Failed to sync. Please try again once you are back online."
+            return isHz(req)
+                ? messageResponse(req, message)
+                : htmlResponse(pageHtml(`<p>${message}</p>`))
         }
     }
 
     await notifyPendingSync()
-    return new Response(JSON.stringify({ redirectUrl: req.referrer || homePage }), {
-        headers: { "Content-Type": "application/json" },
-        status: 200,
-    })
+    // Reload the page the sync was started from so it shows the synced data. From
+    // htmz, the iframe lands on a whole page, which htmz then navigates to.
+    let back = req.referrer && req.referrer !== "about:client" ? req.referrer : homePage
+    return Response.redirect(back, 303)
 }
 
 // Cache keys are paths, not requests: the build stamps static files with a
 // "?_=<hash>" cache buster which would otherwise make every deploy a cache miss
-// for files we already have. Partials asked for by html-form get their own
-// namespace so they can't be handed back to a full page load.
-function cacheKey(request: Request, url: URL) {
+// for files we already have. Partials htmz asks for keep their `_hz` field, so
+// they can't be handed back to a full page load.
+function cacheKey(url: URL) {
     let params = new URLSearchParams(url.search)
     params.delete("_")
     let search = params.toString()
-    let path = `${url.pathname}${search ? `?${search}` : ""}`
-    return request.headers.get("HF-Request") === "true" ? `/hf${path}` : path
+    return `${url.pathname}${search ? `?${search}` : ""}`
 }
 
 function isFile(url: URL) {
     return url.pathname.includes(".")
 }
 
-// Used only when even the offline page didn't make it into the cache.
-let fallbackHtml = `<!DOCTYPE html>
+// A bare page that renders with nothing else in the cache.
+function pageHtml(body: string) {
+    return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Offline $ Cash Tracker</title>
 <style>body{font-family:system-ui,sans-serif;margin:0 auto;padding:2em 1em;max-width:35em;line-height:1.5}</style>
 </head><body>
 <h1>$ Cash Tracker</h1>
-<p>The server can't be reached, and this page hasn't been saved on this device yet.</p>
+${body}
 <p><a href="${homePage}">New transaction</a></p>
-<p><button onclick="location.reload()">Try again</button></p>
 </body></html>`
+}
+
+// Used only when even the offline page didn't make it into the cache.
+let fallbackHtml = pageHtml(`<p>The server can't be reached, and this page hasn't been saved on this device yet.</p>
+<p><button onclick="location.reload()">Try again</button></p>`)

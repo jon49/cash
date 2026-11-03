@@ -26,16 +26,16 @@ HTTP 200
 xpath "//input[@value='currency']/ancestor::form//input[@value='€']" exists
 xpath "//input[@value='replacementText']/ancestor::form//input[@value='expense->cheese'][@placeholder='old->new']" exists
 
-# Test POST with an HTMF request
+# Test POST with an htmz request
 POST {{url}}/app/settings/
-HF-Request: true
 [Form]
 value: ¥
 id: currency
+_hz: 1
 HTTP 200
 [Asserts]
 header "content-type" == "text/html; charset=utf-8"
-xpath "string(//p)" contains "Saved"
+xpath "string(//div[@id='currencyMsg']//p)" contains "Saved"
 
 GET {{url}}/app/settings/
 HTTP 200

@@ -18,6 +18,7 @@ A cash-transaction tracker that exports CSV (for hledger or spreadsheets). It ru
   hurl --test --variables-file local.env --cookie cookie-jar.tsv transaction.tests.hurl
   ```
   `clean-db.hurl` wipes the test user's data, and `test-all.sh` runs it first.
+- Browser tests use Playwright (`tests/e2e/`), mainly to cover what Hurl can't: the htmz swaps, the no-JS fallbacks and the offline queue. Run `npm run test:e2e`, or one test with `npx playwright test -g "Save & New"`. `playwright.config.ts` reads the same `tests/<env>.env` (choose it with `E2E_ENV`) and starts `./tasks/start.sh` itself unless a server is already up. The tests share one user's data, so they run on a single worker.
 
 There is no linter and no JS unit test suite.
 
@@ -31,12 +32,19 @@ There is no linter and no JS unit test suite.
 
 **Pages.** Handlers render `$template.loadFiles(layout.html, page.html, ...partials)`. Every page is a plain HTML form that POSTs and then redirects (PRG), so it works without JS.
 
-**Progressive enhancement (`pb_public/web/js/`).** `html-form.min.js` ("htmf") intercepts forms and links that carry `hf-target`, `hf-select`, `hf-swap` and similar attributes. It sends them with the header `HF-Request: true` and swaps the HTML fragment it gets back. Handlers check `e.request.header.get("HF-Request") === "true"` to return a partial instead of redirecting. Two response headers also drive it: `hf-events` carries a JSON message, and a 204 means no swap. `app.js` defines small custom elements and an `x-<event>` attribute-based event delegation helper.
+**Progressive enhancement (`pb_public/web/js/`).** `htmz.js` is a progressively enhanced take on htmz, loaded only by the pages that use it (transactions edit, settings). A form opts in with an `hz` attribute on the form or on its submit button. The markup never names the iframe: the script inserts the hidden `<iframe name=htmz>` and, during `submit`, briefly sets `target`/`formtarget` and appends a hidden `_hz=1` field. Without JS, the same forms do normal PRG round trips. A literal `target=htmz` in markup would open a new tab when JS is off, so don't add one.
+- Server: `utils.isHz(e)` checks for `_hz` (in the query for a GET, in the body for a POST) and returns a fragment instead of a full page or redirect.
+- Swapping: each top-level element in the response replaces the page element with the same id, or the one its `hz-target` selector finds. `hz-swap` names another DOM method instead, e.g. `replaceChildren`. Nodes are `importNode`d into the page so they aren't cross-realm (`instanceof` checks in `app.js` would fail otherwise). After a swap, the first `[autofocus]` in the new content is focused.
+- A response that is a whole page (it has a doctype), e.g. where a redirect ended up, gets a real `location.assign`. That's how "Save" works with htmz.
+- `hz:completed` is dispatched on the submitting form, bubbling (or on `document` if the swap removed the form). The `x-modal` element closes on it, so only its own form closes it.
+
+`app.js` defines small custom elements and an `x-<event>` attribute-based event delegation helper.
 
 **Service worker (`src/app/sw.ts`, the only TS/bundled code).** It is served from `/sw.js` so its scope covers the whole site. `pb_public/app/sw.js` is a legacy stub that unregisters itself; leave it in place. Behavior:
-- On install, it precaches the app shell and `alwaysCache` partials. Partials are fetched with `HF-Request` and cached under a `/hf` key prefix so they never get served to a full page navigation.
+- On install, it precaches the app shell, the `alwaysCache` pages and their `?_hz=1` partials. The `_hz` param is part of the cache key, so a partial is never served to a full page navigation.
 - GET pages are network-first, with a cache fallback on network failure or 5xx. Static files (any path containing `.`) and `alwaysCache` paths are cache-first with a background refresh. Cache keys drop the `?_=` buster param.
-- POSTs that fail are queued in IndexedDB (`idb-keyval`, key `postRequests`) and replayed in order through `POST /sw/sync`, except paths in `neverQueue`. The worker answers a queued POST with a 204 carrying an `hf-events` message.
+- htmz requests are recognised by `request.destination === "iframe"`. Offline, they get a `<div id="msg">` fragment rather than a page. Plain navigations get the cached page or the offline page, and queued POSTs get a 204, which leaves the page as is.
+- POSTs that fail are queued in IndexedDB (`idb-keyval`, key `postRequests`) and replayed in order through `POST /sw/sync`, except paths in `neverQueue`. When the sync succeeds, it 303s back to the referring page.
 - `/api/` and `/_/` (PocketBase API and admin UI) bypass the worker.
 
 When you add a page or partial that must work offline, update the `precache`/`alwaysCache` lists in `sw.ts`. When you add a POST that makes no sense to replay later, add it to `neverQueue`.

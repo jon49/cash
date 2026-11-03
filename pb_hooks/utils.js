@@ -9,6 +9,16 @@ module.exports = {
         let firstLetter = s.slice(0, 1)
         return `${firstLetter.toUpperCase()}${s.slice(1)}`
     },
+    /**
+     * Whether the request came from htmz (pb_public/web/js/htmz.js), which wants
+     * fragments back rather than a full page or a redirect. htmz adds the hidden
+     * `_hz` field, so it is in the query string for a GET and the body for a POST.
+     * @param {core.RequestEvent} e
+     * @returns {boolean}
+     */
+    isHz: (e) => {
+        return e.request.url.query().has("_hz") || !!e.requestInfo().body._hz
+    },
     formatDate: (date) => {
         return date.string().slice(0, 10)
     },

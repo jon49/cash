@@ -3,14 +3,15 @@
 routerAdd("get", "/app/categories/edit/", e => {
     let id = e.request.url.query().get("id")
     let msg = e.request.url.query().get("msg")
-    let isHFRequest = e.request.header.get("HF-Request") === "true"
+    let { isHz } = require(`${__hooks}/utils.js`)
+    let isHzRequest = isHz(e)
 
     let data = {
         header: "New Category",
         get title() { return this.header },
         edit: false,
         msg,
-        modal: isHFRequest,
+        modal: isHzRequest,
     }
 
     if (id) {
@@ -27,7 +28,7 @@ routerAdd("get", "/app/categories/edit/", e => {
         })
     }
 
-    let html = (isHFRequest)
+    let html = (isHzRequest)
         ? $template.loadFiles(
             `${__hooks}/pages/transaction_category_edit_form.html`,
             `${__hooks}/pages/categories_edit_form_template.html`,
@@ -61,7 +62,8 @@ routerAdd("post", "/app/categories/edit/", e => {
     record.set("name", subcategory.trim())
     $app.save(record)
 
-    if (e.request.header.get("HF-Request") === "true") {
+    let { isHz } = require(`${__hooks}/utils.js`)
+    if (isHz(e)) {
         let { getCategorySelectData } = require(`${__hooks}/transactions_edit.js`)
         let data = {
             categories: getCategorySelectData(e, $app),

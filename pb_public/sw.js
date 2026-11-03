@@ -37,14 +37,16 @@
   var alwaysCache = [
     "/app/categories/edit/"
   ];
+  var partials = alwaysCache.map((path) => `${path}?_hz=1`);
   var precache = [
     ...alwaysCache,
+    ...partials,
     homePage,
     offlinePage,
     "/web/css/app.css",
     "/web/css/pico.min.css",
     "/web/js/app.js",
-    "/web/js/html-form.min.js",
+    "/web/js/htmz.js",
     "/web/manifest.json",
     "/web/images/cash.svg",
     "/web/images/cash.ico",
@@ -62,23 +64,16 @@
   });
   async function fillCache() {
     let cache = await caches.open(cacheVersion);
-    let addToCache = async (path, hf) => {
+    let addToCache = async (path) => {
       try {
-        let response = await fetch(path, {
-          credentials: "same-origin",
-          headers: hf ? { "HF-Request": "true" } : void 0
-        });
+        let response = await fetch(path, { credentials: "same-origin" });
         if (isCacheable(response)) {
-          await cache.put(hf ? `/hf${path}` : path, response);
+          await cache.put(path, response);
         }
       } catch (_) {
       }
     };
-    await Promise.all([
-      ...precache.map((path) => addToCache(path, false)),
-      // The partials html-form pulls in, e.g. the "Add Category" dialog.
-      ...alwaysCache.map((path) => addToCache(path, true))
-    ]);
+    await Promise.all(precache.map(addToCache));
   }
   async function deleteOldCache() {
     let cacheNames = await caches.keys();
@@ -102,7 +97,7 @@
     }
   );
   async function handleGet(e, request, url) {
-    let key = cacheKey(request, url);
+    let key = cacheKey(url);
     if (isFile(url) || alwaysCache.includes(url.pathname)) {
       return cacheFirst(e, request, key);
     }
@@ -156,7 +151,13 @@
   function isCacheable(response) {
     return !!response && response.status === 200 && response.type === "basic" && !response.redirected;
   }
+  function isHz(request) {
+    return request.destination === "iframe";
+  }
   async function offlineFallback(request, url) {
+    if (isHz(request)) {
+      return messageResponse(request, unreachableMessage);
+    }
     if (request.mode === "navigate") {
       if (url.pathname === "/") {
         let home = await caches.match(homePage);
@@ -164,17 +165,20 @@
       }
       let page = await caches.match(offlinePage);
       if (page) return page;
-      return new Response(fallbackHtml, {
-        status: 200,
-        headers: { "Content-Type": "text/html; charset=utf-8" }
-      });
+      return htmlResponse(fallbackHtml);
     }
-    return messageResponse(unreachableMessage);
+    return messageResponse(request, unreachableMessage);
   }
-  function messageResponse(message) {
-    return new Response(null, {
-      status: 204,
-      headers: { "hf-events": JSON.stringify({ message }) }
+  function messageResponse(request, message) {
+    if (isHz(request)) {
+      return htmlResponse(`<div id="msg"><p class="msg">${message}</p></div>`);
+    }
+    return new Response(null, { status: 204 });
+  }
+  function htmlResponse(html) {
+    return new Response(html, {
+      status: 200,
+      headers: { "Content-Type": "text/html; charset=utf-8" }
     });
   }
   async function handlePost(request, url) {
@@ -188,11 +192,11 @@
     } catch (_) {
     }
     if (neverQueue.includes(url.pathname)) {
-      return messageResponse("Can't reach the server right now. Please try again once you are back online.");
+      return messageResponse(request, "Can't reach the server right now. Please try again once you are back online.");
     }
     await savePostRequest(clonedRequest);
     await notifyPendingSync();
-    return messageResponse(offlineMessage);
+    return messageResponse(request, offlineMessage);
   }
   self.addEventListener("message", async (event) => {
     let data = event.data;
@@ -244,34 +248,35 @@
       } catch (error) {
         console.error("Failed to sync request", error);
         await notifyPendingSync();
-        return new Response("<p>Failed to sync. Please try again once you are back online.</p>", { status: 200, headers: { "Content-Type": "text/html" } });
+        let message = "Failed to sync. Please try again once you are back online.";
+        return isHz(req) ? messageResponse(req, message) : htmlResponse(pageHtml(`<p>${message}</p>`));
       }
     }
     await notifyPendingSync();
-    return new Response(JSON.stringify({ redirectUrl: req.referrer || homePage }), {
-      headers: { "Content-Type": "application/json" },
-      status: 200
-    });
+    let back = req.referrer && req.referrer !== "about:client" ? req.referrer : homePage;
+    return Response.redirect(back, 303);
   }
-  function cacheKey(request, url) {
+  function cacheKey(url) {
     let params = new URLSearchParams(url.search);
     params.delete("_");
     let search = params.toString();
-    let path = `${url.pathname}${search ? `?${search}` : ""}`;
-    return request.headers.get("HF-Request") === "true" ? `/hf${path}` : path;
+    return `${url.pathname}${search ? `?${search}` : ""}`;
   }
   function isFile(url) {
     return url.pathname.includes(".");
   }
-  var fallbackHtml = `<!DOCTYPE html>
+  function pageHtml(body) {
+    return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Offline $ Cash Tracker</title>
 <style>body{font-family:system-ui,sans-serif;margin:0 auto;padding:2em 1em;max-width:35em;line-height:1.5}</style>
 </head><body>
 <h1>$ Cash Tracker</h1>
-<p>The server can't be reached, and this page hasn't been saved on this device yet.</p>
+${body}
 <p><a href="${homePage}">New transaction</a></p>
-<p><button onclick="location.reload()">Try again</button></p>
 </body></html>`;
+  }
+  var fallbackHtml = pageHtml(`<p>The server can't be reached, and this page hasn't been saved on this device yet.</p>
+<p><button onclick="location.reload()">Try again</button></p>`);
 })();

@@ -99,7 +99,9 @@ class xModal extends HTMLElement {
         this.dialog.addEventListener('close', this)
         this.dialog.addEventListener('click', this)
         this.box = this.dialog.querySelector("[box]")
-        this.addEventListener('hf:completed', this)
+        // htmz fires this on the form it submitted, so only the modal's own form
+        // closes it.
+        this.addEventListener('hz:completed', this)
     }
 
     /** @param {Event} event */
@@ -111,7 +113,7 @@ class xModal extends HTMLElement {
         this.handleclose()
     }
 
-    "handlehf:completed"() {
+    "handlehz:completed"() {
         this.handleclose()
     }
 
@@ -163,12 +165,6 @@ class xDelete extends HTMLElement {
 }
 
 window.customElements.define('x-delete', xDelete)
-
-document.addEventListener("message", e => {
-    let el = document.getElementById("msg")
-    if (!el) return
-    el.innerHTML = `<p class="msg">${e.detail}</p>`
-})
 
 // The worker is served from the root so that its scope covers every page --
 // "/" and "/login" included -- and not just "/app/".

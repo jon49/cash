@@ -31,10 +31,10 @@ routerAdd("post", "/app/transactions/edit/", e => {
     $app.save(transaction)
 
     if (e.request.url.query().has("addAnother")) {
-        if (e.request.header.get("HF-Request") === "true") {
+        let utils = require(`${__hooks}/utils.js`)
+        if (utils.isHz(e)) {
             let { getEditTransactionPage, getCategorySelectData } = require(`${__hooks}/transactions_edit.js`)
-            let utils = require(`${__hooks}/utils.js`)
-            return getEditTransactionPage(e, $app, $template, __hooks, utils, getCategorySelectData)
+            return getEditTransactionPage(e, $app, $template, __hooks, utils, getCategorySelectData, true)
         }
         return e.redirect(302, `/app/transactions/edit/`)
     }

@@ -48,7 +48,7 @@ login
 run_with_cookies \
     ./category.tests.hurl \
     ./transaction.tests.hurl \
-    ./transaction-htmf.tests.hurl \
+    ./transaction-htmz.tests.hurl \
     ./export.tests.hurl \
     ./settings.tests.hurl \
     ./logout.tests.hurl
