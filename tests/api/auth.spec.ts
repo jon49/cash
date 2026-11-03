@@ -42,7 +42,11 @@ test("logout ends the session", async ({ api, html }) => {
 
     let response = await api.get("/app/logout/")
     expectRedirect(response, "/login")
-    expect(setCookie(response, "session")).toMatch(/^session=(;|$)/)
+    // It has to match the cookie login set, path and all, or the browser keeps it.
+    let cookie = setCookie(response, "session")!
+    expect(cookie).toMatch(/^session=;/)
+    expect(cookie).toMatch(/; Path=\/app(;|$)/)
+    expect(cookie).toMatch(/; Max-Age=0(;|$)/)
 
     // The session is gone on the server too, not just the cookie.
     expectRedirect(await api.get("/app/settings/"), "/login")

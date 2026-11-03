@@ -49,10 +49,16 @@ routerAdd("get", "/app/logout/", e => {
 
     let sessionRecord = $app.findRecordById("sessions", session)
     $app.delete(sessionRecord)
+    // Clear the cookie login set. The browser only replaces a cookie with the same
+    // path, and in Go a maxAge of 0 means "no Max-Age" while a negative one sends
+    // Max-Age=0, which deletes it.
     e.setCookie({
         name: "session",
-        maxAge: 0,
         value: "",
+        path: "/app",
+        httpOnly: true,
+        secure: true,
+        maxAge: -1,
     })
     e.redirect(302, "/login")
 })
