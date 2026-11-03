@@ -1,27 +1,10 @@
-import { test, expect, type Page } from "@playwright/test"
+import { test, expect } from "@playwright/test"
+import { gotoNewTransaction, login, unique } from "./helpers"
 
 // End to end checks for the htmz progressive enhancement
 // (pb_public/web/js/htmz.js): with JS forms swap fragments in through a hidden
-// iframe, without JS the very same forms do normal round trips.
-
-async function login(page: Page) {
-    await page.goto("/login")
-    await page.fill("input[name=email]", process.env.E2E_EMAIL!)
-    await page.fill("input[name=password]", process.env.E2E_PASSWORD!)
-    await Promise.all([page.waitForURL(/\/app\//), page.click("input[type=submit]")])
-}
-
-// The transaction page redirects to the category page until there is a category.
-async function gotoNewTransaction(page: Page) {
-    await page.goto("/app/transactions/edit/")
-    if (page.url().includes("/categories/edit")) {
-        await page.fill("input[name=subcategory]", "E2E")
-        await Promise.all([page.waitForURL(/\/app\/categories\/$/), page.click("button[form=categoryForm]")])
-        await page.goto("/app/transactions/edit/")
-    }
-}
-
-let unique = (prefix: string) => `${prefix} ${Date.now().toString(36)}`
+// iframe, without JS the very same forms do normal round trips. Offline
+// behaviour is in offline.spec.ts.
 
 test.describe("with JavaScript", () => {
     test.beforeEach(async ({ page }) => {
@@ -92,38 +75,6 @@ test.describe("with JavaScript", () => {
         await input.fill(original)
         await input.press("Tab")
         await expect(msg).toContainText("Saved!")
-    })
-
-    test("offline saves are queued and synced", async ({ page, context }) => {
-        // Let the worker install and take control of the page.
-        await page.evaluate(() => navigator.serviceWorker.ready)
-        await page.reload()
-        await page.evaluate(() => navigator.serviceWorker.ready)
-        expect(await page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true)
-
-        await context.setOffline(true)
-        let description = unique("Offline")
-        await page.fill("input[name=description]", description)
-        await page.fill("input[name=amount]", "7")
-        await page.click("button:text-is('Save')")
-
-        await expect(page.locator("#msg")).toContainText("You are currently offline")
-        await expect(page.locator("#sync")).toBeVisible()
-        expect(page.url()).toMatch(/\/app\/transactions\/edit\/$/)
-
-        // The dialog partial comes from the cache.
-        await page.click("text=Add Category")
-        await expect(page.locator("#dialog x-modal dialog[open]")).toBeVisible()
-        await page.keyboard.press("Escape")
-        await expect(page.locator("x-modal")).toHaveCount(0)
-
-        await context.setOffline(false)
-        await Promise.all([page.waitForEvent("load"), page.click("#sync button")])
-        expect(page.url()).toMatch(/\/app\/transactions\/edit\/$/)
-        await expect(page.locator("#sync")).toBeHidden()
-
-        await page.goto("/app/transactions/")
-        await expect(page.locator("body")).toContainText(description)
     })
 })
 

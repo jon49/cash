@@ -12,6 +12,7 @@ let env = Object.fromEntries(
 
 process.env.E2E_EMAIL = env.email
 process.env.E2E_PASSWORD = env.password
+process.env.E2E_URL = env.url
 
 export default defineConfig({
     testDir: "tests",
