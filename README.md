@@ -99,9 +99,10 @@ over to the new one.
 
 ### Testing
 
-Make sure you have the service running (`./tasks/start.sh`). Add the file
-`local.env` to the `tests` directory. It should contain a test email and
-password of your choosing:
+The tests use [Playwright](https://playwright.dev/). Add the file `local.env`
+to the `tests` directory. It should contain the url and the email and password
+of a test user you have created. **The tests delete all of that user's data**,
+so don't use an account you care about:
 
 ```env
 password=12345678
@@ -109,21 +110,16 @@ email=tester@example.com
 url=http://127.0.0.1:8090
 ```
 
-Make sure you have [Hurl](https://hurl.dev/) `6.0.0` installed. To run the tests
-run the command, `./tests/test-all.sh`.
-
-Note the caveat given in the FAQ in the Hurl documentation for Hurl about Mac
-computers and libcurl caveats. I don't have a Mac so I don't know if it really
-matters for the current test set up.
-
-The browser tests use [Playwright](https://playwright.dev/). They read the same
-`tests/local.env` file and start the server themselves if it isn't running:
+Then run them. They start the server themselves if it isn't already running:
 
 ```
 npm i
 npx playwright install chromium
-npm run test:e2e
+npm test
 ```
+
+`tests/api` checks the server over HTTP, and `tests/e2e` drives a real browser,
+with and without JavaScript, and offline.
 
 ## Running in Production
 

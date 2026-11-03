@@ -11,14 +11,11 @@ A cash-transaction tracker that exports CSV (for hledger or spreadsheets). It ru
 - `./tasks/start.sh`: run the app (`pocketbase serve --dev`) at http://127.0.0.1:8090. The `pocketbase` binary must be on PATH. First-time setup (import `schema/pb_schema.json` in the admin UI, create a verified user) is described in README.md.
 - `npm start`: esbuild watch that bundles `src/app/sw.ts` to `pb_public/sw.js`. Only needed when changing the service worker.
 - `./tasks/build.sh`: production build into `dist/`. It copies the hooks, public files and migrations, adds `?_=<md5>` cache busters to static references in `pb_hooks/pages/*.html` and `manifest.json`, builds the worker to `dist/public/web/js/sw.js`, replaces `__CACHE_VERSION__` with a timestamp, and writes a `dist/public/sw.js` loader that calls `importScripts` on it.
-- Tests use [Hurl](https://hurl.dev/) 6.0.0 against a running server. Start the server first, then run `./tests/test-all.sh` (add `--debug` for verbose output, `--env <name>` to use `tests/<name>.env`; `local` is the default). The env file sets `email`, `password` and `url`, and that user must exist.
-- To run a single test file, log in first to fill the cookie jar, then run the file with it (from `tests/`):
-  ```
-  hurl --test --variables-file local.env --cookie-jar cookie-jar.tsv login.hurl
-  hurl --test --variables-file local.env --cookie cookie-jar.tsv transaction.tests.hurl
-  ```
-  `clean-db.hurl` wipes the test user's data, and `test-all.sh` runs it first.
-- Browser tests use Playwright (`tests/e2e/`), mainly to cover what Hurl can't: the htmz swaps, the no-JS fallbacks and the offline queue. Run `npm run test:e2e`, or one test with `npx playwright test -g "Save & New"`. `playwright.config.ts` reads the same `tests/<env>.env` (choose it with `E2E_ENV`) and starts `./tasks/start.sh` itself unless a server is already up. The tests share one user's data, so they run on a single worker.
+- Tests use Playwright: `npm test`, or one file with `npx playwright test tests/api/export.spec.ts`, or one test with `-g "Save & New"`. `playwright.config.ts` reads `tests/<env>.env` (`url`, `email`, `password`; choose it with `E2E_ENV`, default `local`) and starts `./tasks/start.sh` itself unless a server is already up. The test user must already exist.
+  - `tests/api/`: HTTP-level tests for routes, redirects, form handling, htmz fragments and the CSV export. They use the `api` fixture in `tests/fixtures.ts`, which **wipes the test user's data** and logs in fresh for every test, and doesn't follow redirects. `html(response)` loads a response into the page so it can be checked with locators.
+  - `tests/e2e/`: real-browser tests for htmz swaps, the no-JS fallbacks and the offline queue/sync.
+  - The session cookie is `secure`. Browsers send it to `http://127.0.0.1`, but Playwright's request client doesn't, so the `api` fixture passes it as an explicit `Cookie` header.
+  - Every test shares one user in one database, so they run on a single worker.
 
 There is no linter and no JS unit test suite.
 

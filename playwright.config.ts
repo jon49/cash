@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test"
 import { readFileSync } from "node:fs"
 
-// Share the Hurl suite's settings: tests/<env>.env holds the url and the test
+// tests/<env>.env holds the url and the test
 // user's email and password. Pick another file with E2E_ENV, e.g. E2E_ENV=ci.
 let env = Object.fromEntries(
     readFileSync(`tests/${process.env.E2E_ENV ?? "local"}.env`, "utf8")
@@ -14,7 +14,7 @@ process.env.E2E_EMAIL = env.email
 process.env.E2E_PASSWORD = env.password
 
 export default defineConfig({
-    testDir: "tests/e2e",
+    testDir: "tests",
     // The tests share one user's data in one database, so run them one at a time.
     workers: 1,
     fullyParallel: false,

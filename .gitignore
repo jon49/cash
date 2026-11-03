@@ -1,4 +1,3 @@
-cookie-jar.tsv
 dist
 pb_public/web/images/*
 !cash.svg
